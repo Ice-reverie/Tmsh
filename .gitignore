@@ -2,6 +2,8 @@
 *.sln
 .*stash
 *.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
 *.filters
 /*.user
 *.user
