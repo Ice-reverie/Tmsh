@@ -1,0 +1,22 @@
+<?xml version="1.0" standalone="no"?>
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><style>
+                .cad-stroke { stroke: #475569; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+                .cad-stroke-thin { stroke: #475569; stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+                .cad-fill-white { fill: #FFFFFF; }
+                .cad-fill-shade { fill: #CBD5E1; }
+                .cad-fill-blue { fill: #3B82F6; }
+                .cad-fill-blue-light { fill: #DBEAFE; }
+                .cad-accent-red { stroke: #EF4444; fill: none; }
+                .cad-accent-orange { stroke: #F97316; fill: none; }
+            </style>
+                    <!-- Mirror Plane -->
+                    <path d="M16 2 L16 30" stroke="#475569" stroke-width="1" stroke-dasharray="3 2"/>
+                    <rect x="15.5" y="2" width="1" height="28" fill="#CBD5E1" opacity="0.5"/>
+                    <!-- Source Object (Blue) -->
+                    <path d="M4 12 L12 8 L12 20 L4 24 Z" class="cad-fill-blue" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+                    <!-- Mirrored Object (Gray/Ghost) -->
+                    <path d="M28 12 L20 8 L20 20 L28 24 Z" fill="none" stroke="#94A3B8" stroke-width="1.5" stroke-linejoin="round" stroke-dasharray="2 1"/>
+                    <!-- Arrow -->
+                    <path d="M10 26 L22 26" stroke="#475569" stroke-width="1"/>
+                    <path d="M10 24 L10 28 M22 24 L22 28" stroke="#475569" stroke-width="1"/>
+                </svg>

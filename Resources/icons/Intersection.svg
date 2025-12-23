@@ -1,0 +1,21 @@
+<?xml version="1.0" standalone="no"?>
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><style>
+                .cad-stroke { stroke: #475569; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+                .cad-stroke-thin { stroke: #475569; stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+                .cad-fill-white { fill: #FFFFFF; }
+                .cad-fill-shade { fill: #CBD5E1; }
+                .cad-fill-blue { fill: #3B82F6; }
+                .cad-fill-blue-light { fill: #DBEAFE; }
+                .cad-accent-red { stroke: #EF4444; fill: none; }
+                .cad-accent-orange { stroke: #F97316; fill: none; }
+            </style>
+                    <!-- Left Ghost -->
+                    <path d="M4 12 L12 8 L16 10 L8 14 Z" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M4 12 L4 22 L8 24" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-linejoin="round"/>
+                    <!-- Right Ghost -->
+                    <path d="M20 8 L28 12 L28 22 L24 24" fill="none" stroke="#CBD5E1" stroke-width="1.5" stroke-linejoin="round"/>
+                    <!-- Intersection Volume (Solid Blue) -->
+                    <path d="M12 8 L20 8 L24 14 L16 14 Z" class="cad-fill-blue" stroke="#3B82F6" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M16 14 L24 14 L24 24 L16 24 Z" class="cad-fill-blue" fill-opacity="0.6" stroke="#3B82F6" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M8 14 L16 14 L16 24 L8 24 Z" class="cad-fill-blue" fill-opacity="0.8" stroke="#3B82F6" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>

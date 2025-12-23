@@ -1,0 +1,15 @@
+现在能写个脚本，找下qt的安装位置路径，
+需要定位到Qt\Qt5.14.2\5.14.2\msvc2017_64\bin这个目录，然后找到qtenv2.bat这个文件，执行这个脚本，
+然后输入windeployqt，后面加上需要部署的目标文件路径：
+- Release：output/bin/PythonQt_QtAll-Qt5-Python3.7.dll
+- Debug：output/bin_d/PythonQt_QtAll-Qt5-Python3.7_d.dll
+
+通过执行这个命令就可以执行动态库的拷贝工作。
+
+已新增两个一键脚本（仓库根目录）来自动完成“定位Qt + 调用qtenv2.bat + 执行windeployqt”：
+- deploy_qt_release.bat（默认部署 Release 目标dll）
+- deploy_qt_debug.bat（默认部署 Debug 目标dll）
+
+脚本会优先通过 QTDIR/QT_DIR、PATH、常见Qt安装目录自动查找 qtenv2.bat；找不到会提示手动输入一次，并缓存到 %LOCALAPPDATA%\APPMesh\qt_qtenv2_path.txt 以便下次复用。
+脚本默认会输出 qtenv2.bat 和 windeployqt 的信息；如果你希望脚本执行完不要等待按键，可加参数：--no-pause
+注意：脚本强制要求使用 Qt 的 msvc2017_64 套件（...\msvc2017_64\bin\qtenv2.bat）。如果没找到这个套件，会直接退出并不会执行 windeployqt。

@@ -1,0 +1,3 @@
+﻿#include "FITKWidgetAPI.h"
+#include "FITK_Kernel/FITKCore/FITKLibInfo.h"
+FITKLIBINFOREGISTER(FITKWidget, FITKWIDGETVERSION);

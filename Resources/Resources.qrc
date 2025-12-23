@@ -1,0 +1,37 @@
+<RCC>
+    <qresource prefix="/">
+        <file>./icons/Box.svg</file>
+        <file>./icons/Chamfer.svg</file>
+        <file>./icons/Circ_Pattern.svg</file>
+        <file>./icons/Curve_Split.svg</file>
+        <file>./icons/Cylinder.svg</file>
+        <file>./icons/Delete_Face.svg</file>
+        <file>./icons/Difference.svg</file>
+        <file>./icons/Export_CGNS.svg</file>
+        <file>./icons/Export_INP.svg</file>
+        <file>./icons/Fill_Gaps.svg</file>
+        <file>./icons/Fillet.svg</file>
+        <file>./icons/Import.svg</file>
+        <file>./icons/Imprint_Solid.svg</file>
+        <file>./icons/Intersection.svg</file>
+        <file>./icons/License.svg</file>
+        <file>./icons/Merge_Line.svg</file>
+        <file>./icons/Mesh_Box_Mesh.svg</file>
+        <file>./icons/Mesh_Cylinder_Mesh.svg</file>
+        <file>./icons/Mesh_Region_Info.svg</file>
+        <file>./icons/Mesh_Settings.svg</file>
+        <file>./icons/Mesh_Sphere_Mesh.svg</file>
+        <file>./icons/Mirror.svg</file>
+        <file>./icons/New_Project.svg</file>
+        <file>./icons/Open_File.svg</file>
+        <file>./icons/Plugins.svg</file>
+        <file>./icons/Rect_Pattern.svg</file>
+        <file>./icons/Save.svg</file>
+        <file>./icons/Solid_Split.svg</file>
+        <file>./icons/Sphere.svg</file>
+        <file>./icons/Surf_Split.svg</file>
+        <file>./icons/Union.svg</file>
+        <file>./icons/APPMesh.ico</file>
+        <file>./icons/paraview.png</file>
+    </qresource>
+</RCC>

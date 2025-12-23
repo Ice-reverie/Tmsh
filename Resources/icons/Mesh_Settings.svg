@@ -1,0 +1,23 @@
+<?xml version="1.0" standalone="no"?>
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><style>
+                .cad-stroke { stroke: #475569; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+                .cad-fill-white { fill: #FFFFFF; }
+                .cad-fill-shade { fill: #CBD5E1; }
+                .cad-fill-blue { fill: #3B82F6; }
+                .mesh-lines-blue { stroke: #1E40AF; stroke-width: 0.5; fill: none; opacity: 0.6; }
+                .mesh-lines-gray { stroke: #64748B; stroke-width: 0.5; fill: none; opacity: 0.5; }
+            </style>
+                    <!-- Mesh Patch Background -->
+                    <path d="M14 6 L26 6 L26 18 L14 18 Z" class="cad-fill-white" stroke="#94A3B8" stroke-width="1"/>
+                    <!-- Mesh Grid on Patch -->
+                    <path d="M14 10 L26 10 M14 14 L26 14 M18 6 L18 18 M22 6 L22 18" class="mesh-lines-gray"/>
+                    
+                    <!-- Gear Foreground -->
+                    <g transform="translate(-2, 2)">
+                        <path d="M14 14 C 18 14, 18 22, 14 22 C 10 22, 10 14, 14 14 Z" class="cad-fill-shade" stroke="none"/>
+                        <circle cx="14" cy="18" r="4" class="cad-fill-white" stroke="#475569" stroke-width="1.5"/>
+                        <circle cx="14" cy="18" r="1.5" class="cad-fill-blue" stroke="none"/>
+                        <!-- Gear Teeth -->
+                        <path d="M14 12 L14 11 M18 14 L19 13 M20 18 L21 18 M18 22 L19 23 M14 24 L14 25 M10 22 L9 23 M8 18 L7 18 M10 14 L9 13" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
+                    </g>
+                </svg>

@@ -1,0 +1,7 @@
+制作一个脚本文件，用于删除当前项目中的以下后缀文件：
+.sln
+.pro.user
+.vcxproj
+.vcxproj.user
+.vcxproj.filters
+.qmakke.stash

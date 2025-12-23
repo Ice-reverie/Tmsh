@@ -1,0 +1,24 @@
+<?xml version="1.0" standalone="no"?>
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><style>
+                .cad-stroke { stroke: #475569; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+                .cad-fill-white { fill: #FFFFFF; }
+                .cad-fill-shade { fill: #CBD5E1; }
+                .cad-fill-blue { fill: #3B82F6; }
+                .mesh-lines-blue { stroke: #1E40AF; stroke-width: 0.5; fill: none; opacity: 0.6; }
+                .mesh-lines-gray { stroke: #64748B; stroke-width: 0.5; fill: none; opacity: 0.5; }
+            </style>
+                    <!-- Body -->
+                    <path d="M6 10 L6 22 C6 26, 26 26, 26 22 L26 10" class="cad-fill-white" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+                    
+                    <!-- Side Mesh Lines (Verticals & Rings) -->
+                    <path d="M11 10 L11 23 M16 14 L16 26 M21 10 L21 23" class="mesh-lines-gray"/>
+                    <path d="M6 14 C6 17, 26 17, 26 14" class="mesh-lines-gray"/>
+                    <path d="M6 18 C6 21, 26 21, 26 18" class="mesh-lines-gray"/>
+                    
+                    <!-- Top Face Blue -->
+                    <ellipse cx="16" cy="10" rx="10" ry="4" class="cad-fill-blue" stroke="#475569" stroke-width="1.5"/>
+                    
+                    <!-- Top Mesh Pattern (Radial) -->
+                    <ellipse cx="16" cy="10" rx="5" ry="2" class="mesh-lines-blue"/>
+                    <path d="M16 10 L6 10 M16 10 L26 10 M16 10 L16 6 M16 10 L16 14" class="mesh-lines-blue"/>
+                </svg>
