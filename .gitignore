@@ -8,3 +8,8 @@
 /output/
 /generate
 Tools/Win64/
+
+# qmake generated makefiles
+Makefile
+Makefile.Debug
+Makefile.Release
