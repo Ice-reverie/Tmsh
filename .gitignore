@@ -1,0 +1,10 @@
+.vs
+*.sln
+.*stash
+*.vcxproj
+*.filters
+/*.user
+*.user
+/output/
+/generate
+Tools/Win64/
