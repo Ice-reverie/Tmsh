@@ -27,7 +27,7 @@ win32{
         -lFITKInterfaceMeshGen \
         -lFITKInterfaceModel \
         -lFITKInterfaceIO \
-        -lFITKGmshMshIO \
+        -lFITKTmshMshIO \
         -lFITKWidget \
         -lFITKInterfaceGeometry \
 
@@ -44,7 +44,7 @@ win32{
         -lFITKInterfaceMeshGen \
         -lFITKInterfaceModel \
         -lFITKInterfaceIO \
-        -lFITKGmshMshIO \
+        -lFITKTmshMshIO \
         -lFITKWidget \
         -lFITKInterfaceGeometry \
 
@@ -71,7 +71,7 @@ unix{
         -lFITKInterfaceMeshGen \
         -lFITKInterfaceModel \
         -lFITKInterfaceIO \
-        -lFITKGmshMshIO \
+        -lFITKTmshMshIO \
         -lFITKWidget \
         -lFITKInterfaceGeometry \
 
