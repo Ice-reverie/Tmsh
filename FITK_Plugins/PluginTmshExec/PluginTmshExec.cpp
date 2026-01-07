@@ -6,6 +6,7 @@
 #include "FITK_Kernel/FITKAppFramework/FITKAppFramework.h"
 
 #include "FITK_Component/FITKTmshExeDriver/FITKMeshGenTmshExecInterface.h"
+#include "FITK_Component/FITKTmshMshIO/FITKTmshMshIOInterface.h"
 #include "ModelData/MeshManager.h"
 
 #include "OperTmshGenerator.h"
@@ -41,7 +42,13 @@ namespace Plugin
         this->initRibbonUI();
 
         _tMshExecGen = new Tmsh::FITKMeshGenTmshExecInterface;
+
+		// 组件管理器添加TmeshIO组件
+		Tmsh::FITKTmshMshIOInterface* tmshIO = new Tmsh::FITKTmshMshIOInterface;
+
         FITKAPP->getComponents()->addComponent(_tMshExecGen);
+        FITKAPP->getComponents()->addComponent(tmshIO);
+
 
         this->addOperator("actionTmshCreateGlobalMesh", []() { return new ModelOper::OperTmshGenerator(); });
 

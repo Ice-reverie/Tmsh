@@ -412,7 +412,7 @@ namespace AppFrame
     QString FITKApplication::getTempDir( const bool & clearDir , const QString &subDir) const
     {
         //获取系统临时目录
-        QString tempdir = QApplication::applicationDirPath() + "/../FITK_Temp";
+        QString tempdir = QApplication::applicationDirPath() + "/../Tmsh";
         QDir dir(tempdir);
         QString absDir = dir.absolutePath();
         Core::CreateDir(absDir);

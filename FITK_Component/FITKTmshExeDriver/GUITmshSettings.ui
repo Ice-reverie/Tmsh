@@ -14,6 +14,23 @@
    <string/>
   </property>
   <layout class="QGridLayout" name="gridLayout_4">
+   <item row="3" column="1">
+    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_MinAngle"/>
+   </item>
+   <item row="11" column="0" colspan="2">
+    <widget class="QPushButton" name="pushButton_Detailed">
+     <property name="text">
+      <string>Detailed Parameter</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_maxLength">
+     <property name="text">
+      <string>Max Length</string>
+     </property>
+    </widget>
+   </item>
    <item row="1" column="0">
     <widget class="QLabel" name="label_tangencyTolerance">
      <property name="text">
@@ -24,53 +41,13 @@
    <item row="1" column="1">
     <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_TangencyTolerance"/>
    </item>
-   <item row="5" column="0">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="5" column="2">
-    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_MinLength"/>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_maxLength">
-     <property name="text">
-      <string>Max Length</string>
-     </property>
-    </widget>
-   </item>
-   <item row="7" column="2">
+   <item row="8" column="1">
     <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_TetgenSwitches"/>
    </item>
-   <item row="2" column="2">
-    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_NormalTol"/>
+   <item row="5" column="1">
+    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_MinLength"/>
    </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_minLength">
-     <property name="text">
-      <string>Min Length</string>
-     </property>
-    </widget>
-   </item>
-   <item row="10" column="0" colspan="3">
-    <widget class="QPushButton" name="pushButton_Detailed">
-     <property name="text">
-      <string>Detailed Parameter</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="2">
-    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_MaxLength"/>
-   </item>
-   <item row="0" column="0" colspan="3">
+   <item row="0" column="0" colspan="2">
     <widget class="QGroupBox" name="groupBox_PickModel">
      <property name="title">
       <string>PickModel</string>
@@ -103,6 +80,9 @@
      </layout>
     </widget>
    </item>
+   <item row="2" column="1">
+    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_NormalTol"/>
+   </item>
    <item row="2" column="0">
     <widget class="QLabel" name="label_normalTol">
      <property name="text">
@@ -110,7 +90,31 @@
      </property>
     </widget>
    </item>
-   <item row="11" column="0" colspan="3">
+   <item row="8" column="0">
+    <widget class="QLabel" name="label_tetgenSwitches">
+     <property name="text">
+      <string>Tetgen Switches</string>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_tangencyTolerance">
+     <property name="text">
+      <string>Tangent Tolerance</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_minAngle">
+     <property name="text">
+      <string>Min Angle</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="1">
+    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_MaxLength"/>
+   </item>
+   <item row="12" column="0" colspan="2">
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
       <widget class="QPushButton" name="pushButton_OK">
@@ -141,29 +145,12 @@
      </item>
     </layout>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_tangencyTolerance">
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_minLength">
      <property name="text">
-      <string>Tangent Tolerance</string>
+      <string>Min Length</string>
      </property>
     </widget>
-   </item>
-   <item row="7" column="0">
-    <widget class="QLabel" name="label_tetgenSwitches">
-     <property name="text">
-      <string>Tetgen Switches</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="0">
-    <widget class="QLabel" name="label_minAngle">
-     <property name="text">
-      <string>Min Angle</string>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="2">
-    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_MinAngle"/>
    </item>
   </layout>
  </widget>

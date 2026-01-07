@@ -38,6 +38,7 @@ win32{
         -lFITKInterfaceModel \
         -lGraphDataPick \
         -lFITKWidget \
+	-lFITKTmshMshIO \
 
     Debug:CONFIG            +=  console
     Debug:DESTDIR         = ../../output/bin_d/Plugins
@@ -62,6 +63,7 @@ win32{
         -lFITKInterfaceModel \
         -lGraphDataPick \
         -lFITKWidget \
+	-lFITKTmshMshIO \
 
     message("Windows PluginTmshExec generated")
 }
@@ -97,6 +99,7 @@ unix{
         -lFITKInterfaceModel \
         -lGraphDataPick \
         -lFITKWidget \
+	-lFITKTmshMshIO \
 
     message("Linux PluginTmshExec generated")
 }

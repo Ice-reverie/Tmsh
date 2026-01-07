@@ -209,7 +209,7 @@ namespace Tmsh
         // MeshFile 若调用方未提供，则给出默认输出路径
         if (this->getValue("MeshFile").isNull() || this->getValueT<QString>("MeshFile").isEmpty())
         {
-            this->setValue("MeshFile", meshDir.filePath("mesh.msh"));
+            this->setValue("MeshFile", meshDir.filePath("mesh.mesh"));
         }
         // 若输出文件在 meshPath 下，移除旧文件避免干扰新结果（不要清空整个目录，避免误删可执行程序等）
         const QString meshFile = this->getValueT<QString>("MeshFile");

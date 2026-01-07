@@ -7,6 +7,7 @@ SUBDIRS += \
     FITKCompMessageWidget \
     FITKCGNSIO \
     FITKGmshMshIO \
+    FITKTmshMshIO \
     FITKGmshExeDriver \
     FITKTmshExeDriver
 
@@ -17,10 +18,11 @@ FITKCompMessageWidget.subdir = $$PWD/FITKCompMessageWidget
 FITKCGNSIO.subdir = $$PWD/FITKCGNSIO
 FITKGmshExeDriver.subdir = $$PWD/FITKGmshExeDriver
 FITKGmshMshIO.subdir = $$PWD/FITKGmshMshIO
+FITKTmshMshIO.subdir = $$PWD/FITKTmshMshIO
 FITKTmshExeDriver.subdir = $$PWD/FITKTmshExeDriver
 
 FITKGmshExeDriver.depends = FITKGmshMshIO FITKWidget
-FITKTmshExeDriver.depends = FITKGmshMshIO FITKWidget
+FITKTmshExeDriver.depends = FITKTmshMshIO FITKWidget
 
 # Optional modules (currently disabled)
 # SUBDIRS += FITKMeshGenFastCAEGrid FITKAbaqusData FITKAbaqusIOINP
