@@ -9,11 +9,17 @@ namespace Tmsh
         auto* info = new FITKTmshGlobalMeshGenerateAlgorithmInfo;
         info->setTangencyTolerance(15);
 
-        info->setTangencyTolerance(15);
-        info->setTangencyTolerance(15);
-        info->setTangencyTolerance(15);
-        info->setTangencyTolerance(15);
-        info->setTangencyTolerance(15);
+        info->setMinLength(0);
+        info->setMaxLength(0);
+        info->setMeshDim(2);
+        info->setTetgenSwitches("");
+        info->setNormalTol(20);
+        info->setMinAngle(20);
+        info->setUseMultiThreading(1);
+        info->setRefineIter(1);
+        info->setRefineSmoothIter(300);
+        info->setAdaptIter(3);
+        info->setAdaptSmoothIter(30);
 
         return info;
     }
