@@ -1,0 +1,18 @@
+<?xml version="1.0" standalone="no"?>
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><style>
+                .cad-stroke { stroke: #475569; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+                .cad-stroke-thin { stroke: #475569; stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+                .cad-fill-white { fill: #FFFFFF; }
+                .cad-fill-shade { fill: #CBD5E1; }
+                .cad-fill-blue { fill: #3B82F6; }
+                .cad-fill-blue-light { fill: #DBEAFE; }
+                .cad-accent-red { stroke: #EF4444; fill: none; }
+                .cad-accent-orange { stroke: #F97316; fill: none; }
+            </style>
+                    <!-- Curve -->
+                    <path d="M4 24 C 10 24, 10 8, 16 8 C 22 8, 22 24, 28 24" fill="none" stroke="#475569" stroke-width="2" stroke-linecap="round"/>
+                    <!-- Split Point / Knife -->
+                    <line x1="16" y1="4" x2="16" y2="12" stroke="#DC2626" stroke-width="2" stroke-linecap="round"/>
+                    <!-- Highlight split -->
+                    <circle cx="16" cy="8" r="2" fill="white" stroke="#DC2626" stroke-width="1.5"/>
+                </svg>

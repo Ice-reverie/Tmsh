@@ -1,0 +1,17 @@
+<?xml version="1.0" standalone="no"?>
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><style>
+                .cad-stroke { stroke: #475569; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+                .cad-stroke-thin { stroke: #475569; stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+                .cad-fill-white { fill: #FFFFFF; }
+                .cad-fill-shade { fill: #CBD5E1; }
+                .cad-fill-blue { fill: #3B82F6; }
+                .cad-fill-blue-light { fill: #DBEAFE; }
+                .cad-accent-red { stroke: #EF4444; fill: none; }
+                .cad-accent-orange { stroke: #F97316; fill: none; }
+            </style>
+                    <path d="M6 10 L18 10 L18 26 L6 26 Z" class="cad-fill-shade" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M18 16 L15 16 L15 20 L18 20" fill="#E2E8F0" stroke="none"/>
+                    <path d="M18 14 L26 14 L26 22 L18 22" class="cad-fill-blue" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M18 16 L15 16 L15 20 L18 20" class="cad-fill-blue" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M22 16 L22 20" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+                </svg>

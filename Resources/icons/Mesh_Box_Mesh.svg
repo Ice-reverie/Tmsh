@@ -1,0 +1,24 @@
+<?xml version="1.0" standalone="no"?>
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><style>
+                .cad-stroke { stroke: #475569; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+                .cad-fill-white { fill: #FFFFFF; }
+                .cad-fill-shade { fill: #CBD5E1; }
+                .cad-fill-blue { fill: #3B82F6; }
+                .mesh-lines-blue { stroke: #1E40AF; stroke-width: 0.5; fill: none; opacity: 0.6; }
+                .mesh-lines-gray { stroke: #64748B; stroke-width: 0.5; fill: none; opacity: 0.5; }
+            </style>
+                    <!-- Main Body -->
+                    <path d="M16 4 L28 10 L28 22 L16 28 L4 22 L4 10 Z" class="cad-fill-white" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M4 10 L16 16 L28 10" fill="none" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M16 16 L16 28" fill="none" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+                    
+                    <!-- Blue Face (Right) -->
+                    <path d="M16 16 L28 10 L28 22 L16 28 Z" class="cad-fill-blue" fill-opacity="0.9" stroke="none"/>
+                    
+                    <!-- Mesh Grid on Blue Face -->
+                    <path d="M20 14 L20 26 M24 12 L24 24" class="mesh-lines-blue"/> <!-- Verticals -->
+                    <path d="M16 20 L28 14 M16 24 L28 18" class="mesh-lines-blue"/> <!-- Horizontals (slanted) -->
+                    
+                    <!-- Left Face Shade -->
+                    <path d="M4 10 L16 16 L16 28 L4 22 Z" class="cad-fill-shade" fill-opacity="0.3" stroke="none"/>
+                </svg>

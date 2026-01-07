@@ -1,0 +1,23 @@
+<?xml version="1.0" standalone="no"?>
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><style>
+                .cad-stroke { stroke: #475569; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+                .cad-stroke-thin { stroke: #475569; stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+                .cad-fill-white { fill: #FFFFFF; }
+                .cad-fill-shade { fill: #CBD5E1; }
+                .cad-fill-blue { fill: #3B82F6; }
+                .cad-fill-blue-light { fill: #DBEAFE; }
+                .cad-accent-red { stroke: #EF4444; fill: none; }
+                .cad-accent-orange { stroke: #F97316; fill: none; }
+            </style>
+                    <!-- Left Half -->
+                    <path d="M2 12 L10 8 L14 10 L6 14 Z" class="cad-fill-white" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M2 12 L2 24 L6 26 L6 14" class="cad-fill-shade" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M6 26 L14 22 L14 10" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+                    
+                    <!-- Cut Plane Highlight (Blue face on right half) -->
+                    <path d="M18 10 L26 14 L26 26 L18 22 Z" class="cad-fill-blue" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+                    
+                    <!-- Right Half Rest -->
+                    <path d="M18 10 L26 6 L30 8 L26 14" class="cad-fill-white" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M30 8 L30 20 L26 26" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+                </svg>

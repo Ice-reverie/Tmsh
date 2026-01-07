@@ -1,0 +1,17 @@
+.vs
+*.sln
+.*stash
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.filters
+/*.user
+*.user
+/output/
+/generate
+Tools/Win64/
+
+# qmake generated makefiles
+Makefile
+Makefile.Debug
+Makefile.Release

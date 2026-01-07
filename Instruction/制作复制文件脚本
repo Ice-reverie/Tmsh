@@ -1,0 +1,12 @@
+现在所有的生成的文件会按照release和debug模式，分别将文件放到output/bin或者output/bin-debug目录下。
+当前的程序在运行时，需要进行第三方库的拷贝，第三方库放在Tools/Win64目录下。
+为了简化这个过程，你编写两个脚本来自动化这个拷贝过程。
+一个是release_copy.bat，另一个是debug_copy.bat。
+其中release_copy.bat脚本是先遍历Tools/Win64目录下的文件夹，每个文件中的bin文件夹，然后将bin文件夹的的所有文件拷贝到output/bin目录下，
+而debug_copy.bat脚本是先遍历Tools/Win64目录下的文件夹，每个文件中的bind文件夹，然后将bin文件夹的的所有文件拷贝到output/bin-debug目录下。
+
+
+如果有些文件夹没有bind或者bin文件夹，则跳过该文件夹继续处理下一个文件夹。
+对于Python37文件夹，需要单独处理下，需要将当前文件夹下的Lib文件夹，以及当前文件夹下的dll文件全部拷贝到目标目录下。
+对于gmsh文件夹，由于没有bind文件夹，不管是release还是debug模式，都需要将当前文件夹下的bin文件夹的内容全部拷贝到目标目录下。
+对于OpenGL文件夹，不用这个遍历这个了，直接跳过。

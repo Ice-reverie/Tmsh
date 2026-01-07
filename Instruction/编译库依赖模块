@@ -1,0 +1,23 @@
+当前项目是通过 `TEMPLATE = subdirs` 的 `.pro` 分模块来管理的：每个库模块在自己的 `.pro` 里通过 `LIBS += -lXXX` 依赖其它库。
+如果没有在 `subdirs` 工程里把这些“模块依赖”显式表达出来，`qmake -tp vc` 生成的 VS 工程（或 Makefile）可能会按错误顺序编译，进而导致链接失败。
+
+你需要做的事：把“链接依赖（LIBS）”同步为“构建依赖（.depends）”。
+
+1) 先检查每个库模块的 `.pro`
+- 看 `TARGET = XXX`（库名）
+- 看 `LIBS += -lYYY`（依赖的其它库名）
+
+2) 在对应的 `subdirs` 工程里补全 `.depends`
+- 根工程：`APPMesh.pro`
+- 以及各个子聚合工程：如 `FITK_Kernel/FITK_Kernel.pro`、`FITK_Interface/FITK_Interface.pro`、`FITK_Component/FITK_Component.pro`、`GraphData/GraphData.pro`、`FITK_Plugins/FITK_Plugins.pro`
+
+注意：如果 `SUBDIRS += $$PWD/SomeDir` 这种写法包含路径，后续就很难写 `SomeDir.depends = ...`。
+推荐写法是给每个子模块一个“名字”，并用 `.subdir` 指向目录：
+
+SUBDIRS += GraphData GUIWidget
+GraphData.subdir = $$PWD/GraphData
+GUIWidget.subdir = $$PWD/GUIWidget
+GUIWidget.depends = GraphData
+
+3) 重新生成工程
+- Windows：运行 `APPMesh.bat`（内部会执行 `qmake -r -tp vc APPMesh.pro`）

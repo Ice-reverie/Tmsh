@@ -1,0 +1,23 @@
+<?xml version="1.0" standalone="no"?>
+<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg"><style>
+                .cad-stroke { stroke: #475569; stroke-width: 1.5; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+                .cad-stroke-thin { stroke: #475569; stroke-width: 1; stroke-linecap: round; stroke-linejoin: round; fill: none; }
+                .cad-fill-white { fill: #FFFFFF; }
+                .cad-fill-shade { fill: #CBD5E1; }
+                .cad-fill-blue { fill: #3B82F6; }
+                .cad-fill-blue-light { fill: #DBEAFE; }
+                .cad-accent-red { stroke: #EF4444; fill: none; }
+                .cad-accent-orange { stroke: #F97316; fill: none; }
+            </style>
+                    <!-- Base Solid -->
+                    <path d="M2 12 L16 6 L30 12 L30 24 L16 30 L2 24 Z" class="cad-fill-white" stroke="#475569" stroke-width="1.5" stroke-linejoin="round"/>
+                    <path d="M16 6 L16 30" stroke="#CBD5E1" stroke-width="1"/>
+                    
+                    <!-- Imprinted Footprint (Blue Lines on top face) -->
+                    <path d="M12 12 L16 10 L20 12 L16 14 Z" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linejoin="round"/>
+                    
+                    <!-- Tool Body (Small cube floating/touching) -->
+                    <path d="M12 12 L16 10 L20 12 L20 8 L16 6 L12 8 Z" fill="#F1F5F9" stroke="#94A3B8" stroke-width="1" stroke-linejoin="round" opacity="0.8"/>
+                    <path d="M16 10 L16 6" stroke="#94A3B8" stroke-width="1"/>
+                    <path d="M16 14 L20 12" stroke="#94A3B8" stroke-width="1"/>
+                </svg>
