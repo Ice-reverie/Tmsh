@@ -29,6 +29,64 @@ namespace Tmsh
         double getTangencyTolerance() const;
         bool hasTangencyTolerance() const;
         void clearTangencyTolerance();
+
+
+        void setMinLength(double len);
+        double getMinLength() const;
+        bool hasMinLength() const;
+        void clearMinLength();
+
+        void setMaxLength(double len);
+        double getMaxLength() const;
+        bool hasMaxLength() const;
+        void clearMaxLength();
+
+        void setMeshDim(int mes);
+        double getMeshDim() const;
+        bool hasMeshDim() const;
+        void clearMeshDim();
+
+        void setTetgenSwitches(const char* tet);
+        double getTetgenSwitches() const;
+        bool hasTetgenSwitches() const;
+        void clearTetgenSwitches();
+
+        void setNormalTol(double tol);
+        double getNormalTol() const;
+        bool hasNormalTol() const;
+        void clearNormalTol();
+
+        void setMinAngle(double ang);
+        double getMinAngle() const;
+        bool hasMinAngle() const;
+        void clearMinAngle();
+
+
+
+        void setUseMultiThreading(bool thr);
+        double getUseMultiThreading() const;
+        bool hasUseMultiThreading() const;
+        void clearUseMultiThreading();
+
+        void setRefineIter(int ite);
+        double getRefineIter() const;
+        bool hasRefineIter() const;
+        void clearRefineIter();
+
+        void setRefineSmoothIter(int ite);
+        double getRefineSmoothIter() const;
+        bool hasRefineSmoothIter() const;
+        void clearRefineSmoothIter();
+
+        void setAdaptIter(int ite);
+        double getAdaptIter() const;
+        bool hasAdaptIter() const;
+        void clearAdaptIter();
+
+        void setAdaptSmoothIter(int ite);
+        double getAdaptSmoothIter() const;
+        bool hasAdaptSmoothIter() const;
+        void clearAdaptSmoothIter();
     };
 }
 

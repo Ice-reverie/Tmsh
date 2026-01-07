@@ -13,6 +13,8 @@
 
 #include "FITK_Interface/FITKInterfaceGeometry/FITKAbsGeoCommand.h"
 
+#include "GUIDetailedParameters.h"
+
 #include <QMessageBox>
 
 #define LOW_ORDER 1
@@ -59,6 +61,11 @@ namespace GUI
             delete _ui;
             _ui = nullptr;
         }
+        if (_detailedDlg)
+        {
+            delete _detailedDlg;
+            _detailedDlg = nullptr;
+        }
         AppFrame::FITKSignalTransfer* signalTransfer = FITKAPP->getSignalTransfer();
         if (!signalTransfer) return;
         emit signalTransfer->setPickableObjTypeSig(-1);
@@ -94,8 +101,13 @@ namespace GUI
         if (tmshAlg)
         {
             _ui->lineEdit_TangencyTolerance->setText(QString::number(tmshAlg->getTangencyTolerance(), 'g', 16));
-        }
 
+            _ui->lineEdit_MinLength->setText(QString::number(tmshAlg->getMinLength(), 'g', 16));
+            _ui->lineEdit_MaxLength->setText(QString::number(tmshAlg->getMaxLength(), 'g', 16));
+            _ui->lineEdit_TetgenSwitches->setText(QString::number(tmshAlg->getTetgenSwitches(), 'g', 16));
+            _ui->lineEdit_NormalTol->setText(QString::number(tmshAlg->getNormalTol(), 'g', 16));
+            _ui->lineEdit_MinAngle->setText(QString::number(tmshAlg->getMinAngle(), 'g', 16));
+}
     }
 
     void GUITmshSettings::pickFinishedOper(int pickType, int objectId, QHash<QString, void*> objInfo)
@@ -165,6 +177,15 @@ namespace GUI
         if (tmshAlg)
         {
             tmshAlg->setTangencyTolerance(_ui->lineEdit_TangencyTolerance->text().toDouble());
+
+            tmshAlg->setMaxLength(_ui->lineEdit_MaxLength->text().toDouble());
+            tmshAlg->setMinLength(_ui->lineEdit_MinLength->text().toDouble());
+            tmshAlg->setMinAngle(_ui->lineEdit_MinAngle->text().toDouble());
+            tmshAlg->setNormalTol(_ui->lineEdit_NormalTol ->text().toDouble());
+
+            QString TetgenSwitchesText = _ui->lineEdit_TetgenSwitches->text().trimmed();
+            const char* TetgenSwitchesCStr = TetgenSwitchesText.toUtf8().constData();
+            tmshAlg->setTetgenSwitches(TetgenSwitchesCStr);
         }
 
         QVariant v = QVariant::fromValue(_virtualTopos);
@@ -210,4 +231,12 @@ namespace GUI
         if (!signalTransfer) return;
         emit signalTransfer->setPickableObjTypeSig(-1);
     }
+
+    // 实现详细参数按钮点击槽函数
+    void GUITmshSettings::on_pushButton_Detailed_clicked()
+    {
+        GUIDetailedParameters *_detailedDlg = new GUIDetailedParameters;
+        _detailedDlg->show();
+    }
 }
+

@@ -9,6 +9,9 @@
 #include "FITK_Kernel/FITKCore/FITKAbstractGUIDialog.h"
 #include "FITKTmshExeDriverAPI.h"
 
+#include "GUIDetailedParameters.h"
+#include "ui_GUIDetailedParameters.h"
+
 namespace Ui { class GUITmshSettings; }
 
 namespace Interface
@@ -39,12 +42,14 @@ namespace GUI
         void on_pushButton_Cancel_clicked();
         void on_pushButton_Pick_clicked();
         void on_comboBox_Type_currentIndexChanged(int index);
+        void on_pushButton_Detailed_clicked();
 
     private:
         Ui::GUITmshSettings* _ui{};
         bool _isEnablePickModel{ true };
         Interface::FITKAbstractMesherDriver* _driver{};
         QList<Interface::VirtualShape> _virtualTopos{};
+        GUITmshSettings* _detailedDlg{};
     };
 }
 

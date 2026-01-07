@@ -78,3 +78,12 @@ unix{
     message("Linux FITKTmshExeDriver generated")
 }
 
+FORMS += \
+    GUIDetailedParameters.ui
+
+HEADERS += \
+    GUIDetailedParameters.h
+
+SOURCES += \
+    GUIDetailedParameters.cpp
+

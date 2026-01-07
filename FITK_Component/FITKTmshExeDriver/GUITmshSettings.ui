@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>320</width>
-    <height>232</height>
+    <height>336</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -37,41 +37,40 @@
      </property>
     </spacer>
    </item>
-   <item row="4" column="0" colspan="2">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="pushButton_OK">
-       <property name="text">
-        <string>Ok</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>0</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_Cancel">
-       <property name="text">
-        <string>Cancel</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
+   <item row="5" column="2">
+    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_MinLength"/>
    </item>
-   <item row="2" column="1">
-    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_MaxSize"/>
+   <item row="4" column="0">
+    <widget class="QLabel" name="label_maxLength">
+     <property name="text">
+      <string>Max Length</string>
+     </property>
+    </widget>
    </item>
-   <item row="0" column="0" colspan="2">
+   <item row="7" column="2">
+    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_TetgenSwitches"/>
+   </item>
+   <item row="2" column="2">
+    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_NormalTol"/>
+   </item>
+   <item row="5" column="0">
+    <widget class="QLabel" name="label_minLength">
+     <property name="text">
+      <string>Min Length</string>
+     </property>
+    </widget>
+   </item>
+   <item row="10" column="0" colspan="3">
+    <widget class="QPushButton" name="pushButton_Detailed">
+     <property name="text">
+      <string>Detailed Parameter</string>
+     </property>
+    </widget>
+   </item>
+   <item row="4" column="2">
+    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_MaxLength"/>
+   </item>
+   <item row="0" column="0" colspan="3">
     <widget class="QGroupBox" name="groupBox_PickModel">
      <property name="title">
       <string>PickModel</string>
@@ -105,11 +104,66 @@
     </widget>
    </item>
    <item row="2" column="0">
-    <widget class="QLabel" name="label_3">
+    <widget class="QLabel" name="label_normalTol">
      <property name="text">
-      <string>Max Size:</string>
+      <string>Normal Tolerance</string>
      </property>
     </widget>
+   </item>
+   <item row="11" column="0" colspan="3">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton_OK">
+       <property name="text">
+        <string>Ok</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_Cancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
+   <item row="1" column="0">
+    <widget class="QLabel" name="label_tangencyTolerance">
+     <property name="text">
+      <string>Tangent Tolerance</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="0">
+    <widget class="QLabel" name="label_tetgenSwitches">
+     <property name="text">
+      <string>Tetgen Switches</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <widget class="QLabel" name="label_minAngle">
+     <property name="text">
+      <string>Min Angle</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="2">
+    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_MinAngle"/>
    </item>
   </layout>
  </widget>

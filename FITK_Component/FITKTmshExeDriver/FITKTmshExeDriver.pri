@@ -9,6 +9,8 @@ HEADERS += \
     $$PWD/FITKMeshGenTmshExecInterface.h \
     $$PWD/FITKMeshSizeGeneratorTmshExec.h \
     $$PWD/GUITmshSettings.h \
+    $$PWD/GUIDetailedParameters.h \
+    $$PWD/ui_GUIDetailedParameters.h \
 
 
 SOURCES += \
@@ -21,6 +23,8 @@ SOURCES += \
     $$PWD/FITKMeshGenTmshExecInterface.cpp \
     $$PWD/FITKMeshSizeGeneratorTmshExec.cpp \
     $$PWD/GUITmshSettings.cpp \
+    $$PWD/GUIDetailedParameters.cpp \
 
 FORMS += \
     $$PWD/GUITmshSettings.ui \
+    $$PWD/GUIDetailedParameters.ui \

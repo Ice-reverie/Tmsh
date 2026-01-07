@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GUIDetailedParameters</class>
+ <widget class="QWidget" name="GUIDetailedParameters">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>271</width>
+    <height>241</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QPushButton" name="pushButton_OK">
+   <property name="geometry">
+    <rect>
+     <x>139</x>
+     <y>200</y>
+     <width>111</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Ok</string>
+   </property>
+  </widget>
+  <widget class="QWidget" name="">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>30</y>
+     <width>231</width>
+     <height>154</height>
+    </rect>
+   </property>
+   <layout class="QGridLayout" name="gridLayout">
+    <item row="1" column="2">
+     <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_RefineIter"/>
+    </item>
+    <item row="3" column="0">
+     <widget class="QLabel" name="label_adaptIter">
+      <property name="text">
+       <string>Adapt Iter</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="0">
+     <widget class="QLabel" name="label_refineIter">
+      <property name="text">
+       <string>Refine Iter</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_refineSmoothIter">
+      <property name="text">
+       <string>Refine Smooth Iter</string>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="2">
+     <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_RefineSmoothIter"/>
+    </item>
+    <item row="2" column="1">
+     <spacer name="horizontalSpacer">
+      <property name="orientation">
+       <enum>Qt::Horizontal</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
+       <size>
+        <width>40</width>
+        <height>20</height>
+       </size>
+      </property>
+     </spacer>
+    </item>
+    <item row="0" column="2">
+     <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_UseMultiThreading"/>
+    </item>
+    <item row="3" column="2">
+     <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_AdaptIter"/>
+    </item>
+    <item row="0" column="0">
+     <widget class="QLabel" name="label_useMultiThreading">
+      <property name="text">
+       <string>Use Multi Threading</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="0">
+     <widget class="QLabel" name="label_adaptSmoothIter">
+      <property name="text">
+       <string>Adapt Smooth Iter</string>
+      </property>
+     </widget>
+    </item>
+    <item row="4" column="2">
+     <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_AdaptSmoothIter"/>
+    </item>
+   </layout>
+  </widget>
+ </widget>
+ <customwidgets>
+  <customwidget>
+   <class>Comp::FITKSciNotationLineEdit</class>
+   <extends>QLineEdit</extends>
+   <header>FITK_Component/FITKWidget/FITKSciNotationLineEdit.h</header>
+  </customwidget>
+ </customwidgets>
+ <resources/>
+ <connections/>
+</ui>
