@@ -8,6 +8,7 @@
 
 #include "FITK_Kernel/FITKCore/FITKAbstractGUIDialog.h"
 #include "FITKTmshExeDriverAPI.h"
+
 #include "GUIDetailedParameters.h"
 #include "ui_GUIDetailedParameters.h"
 

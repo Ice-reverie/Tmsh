@@ -15,8 +15,6 @@ namespace Tmsh
         info->setTangencyTolerance(15);
         info->setTangencyTolerance(15);
 
-
-
         return info;
     }
 }

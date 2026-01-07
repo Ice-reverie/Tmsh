@@ -15,7 +15,6 @@
 
 #include "GUIDetailedParameters.h"
 
-
 #include <QMessageBox>
 
 #define LOW_ORDER 1
