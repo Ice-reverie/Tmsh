@@ -115,6 +115,53 @@ namespace Tmsh
                 {
                     args << "--tangent_tol" << QString::number(tmshAlg->getTangencyTolerance(), 'g', 16);
                 }
+
+
+                if (tmshAlg && tmshAlg->hasMinLength())
+                {
+                    args << "--min_length" << QString::number(tmshAlg->getMinLength(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasMaxLength())
+                {
+                    args << "--max_length" << QString::number(tmshAlg->getMaxLength(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasMeshDim())
+                {
+                    args << "--mesh_dim" << QString::number(tmshAlg->getMeshDim(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasTetgenSwitches())
+                {
+                    args << "--tetgen_switches" << QString::number(tmshAlg->getTetgenSwitches(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasNormalTol())
+                {
+                    args << "--normal_tol" << QString::number(tmshAlg->getNormalTol(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasMinAngle())
+                {
+                    args << "--min_angle" << QString::number(tmshAlg->getMinAngle(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasUseMultiThreading())
+                {
+                    args << "--use_multi_threading" << QString::number(tmshAlg->getUseMultiThreading(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasRefineIter())
+                {
+                    args << "--refine_iter" << QString::number(tmshAlg->getRefineIter(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasRefineSmoothIter())
+                {
+                    args << "--refine_smooth_iter" << QString::number(tmshAlg->getRefineSmoothIter(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasAdaptIter())
+                {
+                    args << "--adapt_iter" << QString::number(tmshAlg->getAdaptIter(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasAdaptSmoothIter())
+                {
+                    args << "--adapt_smooth_iter" << QString::number(tmshAlg->getAdaptSmoothIter(), 'g', 16);
+                }
+
             }
             return args;
         }

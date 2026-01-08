@@ -62,8 +62,8 @@ namespace EventOper
         virtual void picked(Comp::FITKGraph3DWindowVTK* graphWindow, vtkActor2D* actor);
 
         /**
-         * @brief   拾取单个图片标签接口。[虚函数]
-         * @param   graphWindow：可视化窗口
+         * @brief   拾取单个图片graphWindow：可视化窗口标签接口。[虚函数]
+         * @param
          * @param   actor：演员
          * @author  ChengHaotian (yeguangbaozi@foxmail.com)
          * @date    2024-11-07
