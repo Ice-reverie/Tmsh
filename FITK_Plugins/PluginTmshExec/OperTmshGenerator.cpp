@@ -60,12 +60,17 @@ namespace ModelOper
         return true;
     }
 
-    void OperTmshGenerator::meshGenOper()
-    {
+	void OperTmshGenerator::meshGenOper()
+	{
 		//获取工作目录
-		QString meshPath = FITKAPP->getTempDir(false, "");
+		QString meshPath = FITKAPP->getTempDir(false, "Tmsh");
 		QString meshFile = QString("%1/%2").arg(meshPath).arg("geometryFile");
-		QString meshFileProcessor = QString("%1/%2").arg(meshPath).arg("geometryFile.vol.mesh");
+		QString meshName = "";
+		if (meshName == "")
+		{
+			meshName = "geometryFile.surf.mesh";
+		}
+		QString meshFileProcessor = QString("%1/%2").arg(meshPath).arg(meshName);
 		//获取网格划分接口
 		Interface::FITKMeshGenInterface* mf = Interface::FITKMeshGenInterface::getInstance();
 		if (!mf) return;
@@ -82,7 +87,7 @@ namespace ModelOper
 		//开始划分网格
 		mesher->startMesher();
 		this->setArgs("MeshFile", meshFile);
-    }
+	}
 
     void OperTmshGenerator::meshGenFinished()
     {
