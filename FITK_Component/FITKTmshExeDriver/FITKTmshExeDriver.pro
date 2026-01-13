@@ -79,11 +79,20 @@ unix{
 }
 
 FORMS += \
-    GUIDetailedParameters.ui
+    GUIDetailedParameters.ui \
+    GUITetGenSettings.ui \
+    GUITetGenHelp.ui \
+
 
 HEADERS += \
-    GUIDetailedParameters.h
+    GUIDetailedParameters.h \
+    GUITetGenSettings.h
+    GUITetGenHelp.h \
+
 
 SOURCES += \
-    GUIDetailedParameters.cpp
+    GUIDetailedParameters.cpp \
+    GUITetGenSettings.cpp \
+    GUITetGenHelp.cpp \
+
 

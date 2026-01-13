@@ -49,6 +49,9 @@ namespace Plugin
         //this->addOperator("actionGmshGenerator3D", []() { return new ModelOper::OperGmshGenerator(); });
         //this->addOperator("actionGmshClean", []() { return new ModelOper::OperGmshGenerator(); });
 
+        this->addOperator("actionCreateTetGen", []() { return new ModelOper::OperGmshGenerator(); });
+
+
         this->addOperator("actionRegionMeshSizeBox", []() { return new ModelOper::OperRegionMeshSize(); });
         this->addOperator("actionRegionMeshSizeCylinder", []() { return new ModelOper::OperRegionMeshSize(); });
         this->addOperator("actionRegionMeshSizeSphere", []() { return new ModelOper::OperRegionMeshSize(); });
@@ -83,8 +86,11 @@ namespace Plugin
         SARibbonCategory* page = _actOpersMgr->createPage("Gmsh");
 
         SARibbonPannel* panel = _actOpersMgr->addPanelToCategory(page, "Mesh");
-        QAction* action = _actOpersMgr->createAction("Settings", "actionCreateGlobalMesh", QIcon(":/icons/Mesh_Settings.svg"));
+        QAction* action = _actOpersMgr->createAction("Detri2", "actionCreateGlobalMesh", QIcon(":/icons/Mesh_Settings.svg"));
         _actOpersMgr->addActionToPanel(panel, action, SARibbonPannelItem::Large);
+
+        QAction* Taction = _actOpersMgr->createAction("TetGen", "actionCreateTetGen", QIcon(":/icons/Mesh_Settings.svg"));
+        _actOpersMgr->addActionToPanel(panel, Taction, SARibbonPannelItem::Large);
 
         //panel = _actOpersMgr->addPanelToCategory(page, QObject::tr("Mesh-Generator"));
         //action = _actOpersMgr->createAction("2D", "actionGmshGenerator2D", QIcon());

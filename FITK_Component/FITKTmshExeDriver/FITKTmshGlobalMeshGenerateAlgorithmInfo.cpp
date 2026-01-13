@@ -20,6 +20,9 @@ namespace Tmsh
         constexpr const char* kAdaptSmoothIterKey = "Tmsh.AdaptSmoothIter";
 
 
+        constexpr const char* kFilePathKey = "Tmsh.FilePath";
+
+
         bool isSet(const Core::FITKVarientParams& params, const char* key)
         {
             const QVariant v = params.getValue(key);
@@ -286,5 +289,12 @@ namespace Tmsh
     {
         this->removeVarient(kAdaptSmoothIterKey);
     }
+
+
+    void FITKTmshGlobalMeshGenerateAlgorithmInfo::setFilePath(const char* path)
+    {
+        this->setValue(kFilePathKey, path);
+    }
+
 
 }

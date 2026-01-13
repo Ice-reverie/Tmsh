@@ -12,6 +12,8 @@
 #include "GUIDetailedParameters.h"
 #include "ui_GUIDetailedParameters.h"
 
+#include <QWidget>
+
 namespace Ui { class GUITmshSettings; }
 
 namespace Interface

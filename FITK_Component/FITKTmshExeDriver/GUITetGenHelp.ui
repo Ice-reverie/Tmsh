@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>GUITetGenHelp</class>
+ <widget class="QWidget" name="GUITetGenHelp">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>400</width>
+    <height>567</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Form</string>
+  </property>
+  <widget class="QListWidget" name="listWidget">
+   <property name="geometry">
+    <rect>
+     <x>10</x>
+     <y>10</y>
+     <width>381</width>
+     <height>521</height>
+    </rect>
+   </property>
+   <item>
+    <property name="text">
+     <string>    -p  Tetrahedralizes a piecewise linear complex (PLC).</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -Y  Preserves the input surface mesh (does not modify it).</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -r  Reconstructs a previously generated mesh.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -q  Refines mesh (to improve mesh quality).</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -R  Mesh coarsening (to reduce the mesh elements).</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -A  Assigns attributes to tetrahedra in different regions.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -a  Applies a maximum tetrahedron volume constraint.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -m  Applies a mesh sizing function.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -i  Inserts a list of additional points.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -O  Specifies the level of mesh optimization.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -S  Specifies maximum number of added points.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -T  Sets a tolerance for coplanar test (default 1e-8).</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -X  Suppresses use of exact arithmetic.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -M  No merge of coplanar facets or very close vertices.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -w  Generates weighted Delaunay (regular) triangulation.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -c  Retains the convex hull of the PLC.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -d  Detects self-intersections of facets of the PLC.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -z  Numbers all output items starting from zero.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -f  Outputs all faces to .face file.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -e  Outputs all edges to .edge file.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -n  Outputs tetrahedra neighbors to .neigh file.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -g  Outputs mesh to .mesh file for viewing by Medit.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -k  Outputs mesh to .vtk file for viewing by Paraview.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -J  No jettison of unused vertices from output .node file.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -B  Suppresses output of boundary information.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -N  Suppresses output of .node file.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -E  Suppresses output of .ele file.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -F  Suppresses output of .face and .edge file.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -I  Suppresses mesh iteration numbers.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -C  Checks the consistency of the final mesh.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -Q  Quiet:  No terminal output except errors.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -V  Verbose:  Detailed information, more terminal output.</string>
+    </property>
+   </item>
+  </widget>
+  <widget class="QPushButton" name="pushButton_Back">
+   <property name="geometry">
+    <rect>
+     <x>290</x>
+     <y>540</y>
+     <width>80</width>
+     <height>20</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Back</string>
+   </property>
+  </widget>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

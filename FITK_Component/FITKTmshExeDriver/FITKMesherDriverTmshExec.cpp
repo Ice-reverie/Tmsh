@@ -3,6 +3,7 @@
 #include "FITKTmshExecProgramInputInfo.h"
 #include "FITKTmshExecProgramDriver.h"
 #include "GUITmshSettings.h"
+#include "GUITetGenSettings.h"
 
 #include "FITK_Kernel/FITKAppFramework/FITKAppFramework.h"
 #include "FITK_Kernel/FITKAppFramework/FITKGlobalData.h"
@@ -69,6 +70,11 @@ namespace Tmsh
         {
             this->tmshMeshGenSetting();
         }
+
+        else if (method == 2)
+        {
+            this->tetgenMeshGenSetting();
+        }
     }
 
     void FITKMesherDriverTmshExec::stopMesher(QStringList info /*= QStringList()*/)
@@ -90,7 +96,25 @@ namespace Tmsh
         connect(_settingsDialog, &QDialog::accepted, this, &FITKMesherDriverTmshExec::writerModelFileDriven);
         connect(_settingsDialog, &QObject::destroyed, this, [this]() { _settingsDialog = nullptr; });
         _settingsDialog->show();
+
     }
+
+    void FITKMesherDriverTmshExec::tetgenMeshGenSetting()
+    {
+        if (_tetgenSettingsDialog)
+        {
+            _tetgenSettingsDialog->raise();
+            _tetgenSettingsDialog->activateWindow();
+            return;
+        }
+
+        _tetgenSettingsDialog = new GUI::GUITetGenSettings(this, FITKAPP->getGlobalData()->getMainWindow());
+        connect(_tetgenSettingsDialog, &QDialog::accepted, this, &FITKMesherDriverTmshExec::writerModelFileDriven);
+        connect(_tetgenSettingsDialog, &QObject::destroyed, this, [this]() { _tetgenSettingsDialog = nullptr; });
+        _tetgenSettingsDialog->show();
+
+    }
+
 
     QStringList FITKMesherDriverTmshExec::buildStageArgs(int stage) const
     {

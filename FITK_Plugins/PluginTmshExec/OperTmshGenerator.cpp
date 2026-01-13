@@ -52,6 +52,12 @@ namespace ModelOper
         {
             this->meshGenOper();
         }
+
+        if (_emitter->objectName() == "actionCreateTetGen")
+        {
+            this->tetGenOper();
+        }
+
         return false;
     }
 
@@ -83,6 +89,32 @@ namespace ModelOper
 		mesher->startMesher();
 		this->setArgs("MeshFile", meshFile);
     }
+
+    void OperTmshGenerator::tetGenOper()
+    {
+
+        //获取工作目录
+        QString meshPath = FITKAPP->getTempDir(false, "");
+        QString meshFile = QString("%1/%2").arg(meshPath).arg("geometryFile");
+        QString meshFileProcessor = QString("%1/%2").arg(meshPath).arg("geometryFile.vol.mesh");
+        //获取网格划分接口
+        Interface::FITKMeshGenInterface* mf = Interface::FITKMeshGenInterface::getInstance();
+        if (!mf) return;
+        Interface::FITKAbstractMesherDriver* mesher = mf->getMesherDriver("TmshExec");
+        if (!mesher) return;
+        _mesher = mesher;
+        //关联信号
+        disconnect(mesher, SIGNAL(mesherFinished()), nullptr, nullptr);
+        connect(mesher, SIGNAL(mesherFinished()), this, SLOT(meshGenFinished()));
+        //设置参数
+        mesher->setValue("MeshFile", meshFile);
+        mesher->setValue("MeshFileProcessor", meshFileProcessor);
+        mesher->setValue("Method", 2);
+        //开始划分网格
+        mesher->startMesher();
+        this->setArgs("MeshFile", meshFile);
+    }
+
 
     void OperTmshGenerator::meshGenFinished()
     {
