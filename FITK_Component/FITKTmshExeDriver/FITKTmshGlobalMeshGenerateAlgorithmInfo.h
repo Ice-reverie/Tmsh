@@ -87,6 +87,9 @@ namespace Tmsh
         double getAdaptSmoothIter() const;
         bool hasAdaptSmoothIter() const;
         void clearAdaptSmoothIter();
+
+
+        void setFilePath(const char* path);
     };
 }
 

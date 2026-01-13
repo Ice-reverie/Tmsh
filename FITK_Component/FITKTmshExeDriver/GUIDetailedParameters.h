@@ -5,6 +5,7 @@
 
 #include "FITK_Kernel/FITKCore/FITKAbstractGUIDialog.h"
 #include "FITKTmshExeDriverAPI.h"
+
 #include "GUITmshSettings.h"
 #include "ui_GUITmshSettings.h"
 

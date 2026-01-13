@@ -57,6 +57,10 @@ namespace Plugin
 //        this->addOperator("actionTmshRegionMeshSizeSphere", []() { return new ModelOper::OperRegionMeshSizeTmsh(); });
 //        this->addOperator("actionTmshRegionMeshInfo", []() { return new ModelOper::OperRegionMeshSizeTmsh(); });
 
+        this->addOperator("actionCreateTetGen", []() { return new ModelOper::OperTmshGenerator(); });
+
+
+
         AppFrame::FITKGlobalData* globalData = FITKAPP->getGlobalData();
         ModelData::MeshManager* mgr = globalData->getMeshData<ModelData::MeshManager>();
         if (mgr == nullptr) return;
@@ -84,8 +88,11 @@ namespace Plugin
         SARibbonCategory* page = _actOpersMgr->createPage("Tmsh");
 
         SARibbonPannel* panel = _actOpersMgr->addPanelToCategory(page, "Mesh");
-        QAction* action = _actOpersMgr->createAction("Settings", "actionTmshCreateGlobalMesh", QIcon(":/icons/Mesh_Settings.svg"));
+        QAction* action = _actOpersMgr->createAction("Detri2", "actionTmshCreateGlobalMesh", QIcon(":/icons/Mesh_Settings.svg"));
         _actOpersMgr->addActionToPanel(panel, action, SARibbonPannelItem::Large);
+
+        QAction* Taction = _actOpersMgr->createAction("TetGen", "actionCreateTetGen", QIcon(":/icons/Mesh_Settings.svg"));
+        _actOpersMgr->addActionToPanel(panel, Taction, SARibbonPannelItem::Large);
 
 //        panel = _actOpersMgr->addPanelToCategory(page, QObject::tr("Region Mesh Size"));
 //        action = _actOpersMgr->createAction("Box", "actionTmshRegionMeshSizeBox", QIcon(":/icons/Mesh_Box_Mesh.svg"));

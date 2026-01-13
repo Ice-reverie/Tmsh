@@ -28,6 +28,7 @@ namespace ModelOper
 
     private:
         void meshGenOper();
+        void tetGenOper();
 
     private slots:
         void meshGenFinished();

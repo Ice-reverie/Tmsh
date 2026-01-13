@@ -11,6 +11,9 @@ HEADERS += \
     $$PWD/GUITmshSettings.h \
     $$PWD/GUIDetailedParameters.h \
     $$PWD/ui_GUIDetailedParameters.h \
+    $$PWD/GUITetGenSettings.h \
+    $$PWD/GUITetGenHelp.h \
+    $$PWD/ui_GUITetGenHelp.h \
 
 
 SOURCES += \
@@ -24,7 +27,13 @@ SOURCES += \
     $$PWD/FITKMeshSizeGeneratorTmshExec.cpp \
     $$PWD/GUITmshSettings.cpp \
     $$PWD/GUIDetailedParameters.cpp \
+    $$PWD/GUITetGenSettings.cpp \
+    $$PWD/GUITetGenHelp.cpp \
+
 
 FORMS += \
     $$PWD/GUITmshSettings.ui \
     $$PWD/GUIDetailedParameters.ui \
+    $$PWD/GUITetGenSettings.ui \
+    $$PWD/GUITetGenHelp.ui \
+

@@ -16,6 +16,7 @@
 #include "GUIDetailedParameters.h"
 
 #include <QMessageBox>
+#include <QDebug>
 
 #define LOW_ORDER 1
 #define HIGH_ORDER 2

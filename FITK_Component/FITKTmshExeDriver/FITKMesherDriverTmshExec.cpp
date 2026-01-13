@@ -3,6 +3,7 @@
 #include "FITKTmshExecProgramInputInfo.h"
 #include "FITKTmshExecProgramDriver.h"
 #include "GUITmshSettings.h"
+#include "GUITetGenSettings.h"
 
 #include "FITK_Kernel/FITKAppFramework/FITKAppFramework.h"
 #include "FITK_Kernel/FITKAppFramework/FITKGlobalData.h"
@@ -68,6 +69,11 @@ namespace Tmsh
         {
             this->tmshMeshGenSetting();
         }
+
+        else if (method == 2)
+        {
+            this->tetgenMeshGenSetting();
+        }
     }
 
     void FITKMesherDriverTmshExec::stopMesher(QStringList info /*= QStringList()*/)
@@ -89,6 +95,168 @@ namespace Tmsh
         connect(_settingsDialog, &QDialog::accepted, this, &FITKMesherDriverTmshExec::writerModelFileDriven);
         connect(_settingsDialog, &QObject::destroyed, this, [this]() { _settingsDialog = nullptr; });
         _settingsDialog->show();
+
+    }
+
+    void FITKMesherDriverTmshExec::tetgenMeshGenSetting()
+    {
+        if (_tetgenSettingsDialog)
+        {
+            _tetgenSettingsDialog->raise();
+            _tetgenSettingsDialog->activateWindow();
+            return;
+        }
+
+        _tetgenSettingsDialog = new GUI::GUITetGenSettings(this, FITKAPP->getGlobalData()->getMainWindow());
+        connect(_tetgenSettingsDialog, &QDialog::accepted, this, &FITKMesherDriverTmshExec::writerModelFileDriven);
+        connect(_tetgenSettingsDialog, &QObject::destroyed, this, [this]() { _tetgenSettingsDialog = nullptr; });
+        _tetgenSettingsDialog->show();
+
+    }
+
+
+    QStringList FITKMesherDriverTmshExec::buildStageArgs(int stage) const
+    {
+        QStringList args;
+
+        const QString shapeFile = this->getValueT<QString>("ShapeFile");
+
+        // Stage 1：预处理/几何相关参数
+        if (stage == 1)
+        {
+            if (shapeFile.isEmpty()) return {};
+            args << "--in" << shapeFile;
+
+            // Stage1 专用算法参数
+            Interface::FITKMeshGenInterface* mf = Interface::FITKMeshGenInterface::getInstance();
+            if (mf)
+            {
+                Interface::FITKGlobalMeshGenerateAlgorithmInfo* baseAlg = mf->getGlobalMeshGenerateAlgorithmInfo(kMesherKey);
+                Tmsh::FITKTmshGlobalMeshGenerateAlgorithmInfo* tmshAlg =
+                    dynamic_cast<Tmsh::FITKTmshGlobalMeshGenerateAlgorithmInfo*>(baseAlg);
+                if (tmshAlg && tmshAlg->hasTangencyTolerance())
+                {
+                    args << "--tangent_tol" << QString::number(tmshAlg->getTangencyTolerance(), 'g', 16);
+                }
+
+
+                if (tmshAlg && tmshAlg->hasMinLength())
+                {
+                    args << "--min_length" << QString::number(tmshAlg->getMinLength(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasMaxLength())
+                {
+                    args << "--max_length" << QString::number(tmshAlg->getMaxLength(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasMeshDim())
+                {
+                    args << "--mesh_dim" << QString::number(tmshAlg->getMeshDim(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasTetgenSwitches())
+                {
+                    args << "--tetgen_switches" << QString::number(tmshAlg->getTetgenSwitches(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasNormalTol())
+                {
+                    args << "--normal_tol" << QString::number(tmshAlg->getNormalTol(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasMinAngle())
+                {
+                    args << "--min_angle" << QString::number(tmshAlg->getMinAngle(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasUseMultiThreading())
+                {
+                    args << "--use_multi_threading" << QString::number(tmshAlg->getUseMultiThreading(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasRefineIter())
+                {
+                    args << "--refine_iter" << QString::number(tmshAlg->getRefineIter(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasRefineSmoothIter())
+                {
+                    args << "--refine_smooth_iter" << QString::number(tmshAlg->getRefineSmoothIter(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasAdaptIter())
+                {
+                    args << "--adapt_iter" << QString::number(tmshAlg->getAdaptIter(), 'g', 16);
+                }
+                if (tmshAlg && tmshAlg->hasAdaptSmoothIter())
+                {
+                    args << "--adapt_smooth_iter" << QString::number(tmshAlg->getAdaptSmoothIter(), 'g', 16);
+                }
+
+            }
+            return args;
+        }
+
+        // Stage 2：生成网格（命令行与 Stage1 不同）
+        if (stage == 2)
+        {
+            const QString meshFile = this->getValueT<QString>("MeshFile");
+            if (shapeFile.isEmpty() || meshFile.isEmpty()) return {};
+
+            args << "--in" << shapeFile;
+            args << "--out" << meshFile;
+
+            // Stage2：从全局算法信息/尺寸信息读取参数（按需扩展）
+            Interface::FITKMeshGenInterface* mf = Interface::FITKMeshGenInterface::getInstance();
+            if (mf)
+            {
+                Interface::FITKGlobalMeshGenerateAlgorithmInfo* algInfo = mf->getGlobalMeshGenerateAlgorithmInfo(kMesherKey);
+                if (algInfo)
+                {
+                    args << "--mesh_dim" << QString::number(algInfo->getMeshGenerateDimension());
+                }
+            }
+            return args;
+        }
+        return {};
+    }
+
+    void FITKMesherDriverTmshExec::onProgramFinished()
+    {
+        // 若启用两阶段流水线：Stage1 完成后自动启动 Stage2，仅 Stage2 完成后才发出 mesherFinished()
+        if (_pipelineEnabled && _runningStage == 1)
+        {
+            this->startTmshMeshGenerationDriven(2);
+            return;
+        }
+
+        _pipelineEnabled = false;
+        _runningStage = 0;
+        emit mesherFinished();
+    }
+
+    void FITKMesherDriverTmshExec::startTmshMeshGenerationDriven(int stage)
+    {
+        const QStringList extraArgs = this->getArgs();
+        QStringList args = this->buildStageArgs(stage);
+        if (args.isEmpty())
+        {
+            AppFrame::FITKMessageError(QString("FITKMesherDriverTmshExec: empty args for stage=%1").arg(stage));
+            _pipelineEnabled = false;
+            _runningStage = 0;
+            emit mesherFinished();
+            return;
+        }
+
+        TmshExe::FITKTmshExecProgramInputInfo* inputInfo = new TmshExe::FITKTmshExecProgramInputInfo;
+        inputInfo->setArgs(args);
+
+        AppFrame::FITKProgramTaskManeger* programTaskMgr = FITKAPP->getProgramTaskManager();
+        TmshExe::FITKTmshExecProgramDriver* tmshExe = dynamic_cast<TmshExe::FITKTmshExecProgramDriver*>(
+            programTaskMgr->createProgram(1, "FITKTmshExecProgramDriver", inputInfo));
+        if (!tmshExe) return;
+
+        if (!tmshExe->isExistExeProgram())
+        {
+            delete tmshExe;
+            return;
+        }
+
+        _runningStage = stage;
+        connect(tmshExe, SIGNAL(sig_Finish()), this, SLOT(onProgramFinished()));
+        tmshExe->start();
     }
 
     void FITKMesherDriverTmshExec::writerModelFileDriven()
