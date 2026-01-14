@@ -21,8 +21,8 @@ namespace Tmsh
         m_setSurfManager = setSurfManager;
     }
 
-    bool FITKTmshAdaptorElements::adaptR()
-    {
+	bool FITKTmshAdaptorElements::adaptR()
+	{
 		//获取网格数据对象
 		Interface::FITKUnstructuredMesh* meshObj = dynamic_cast<Interface::FITKUnstructuredMesh*>(_dataObj);
 		if (!meshObj || !_reader) return false;
@@ -33,10 +33,13 @@ namespace Tmsh
 		while (!_reader->atEnd())
 		{
 			QString line = _reader->readLine().trimmed();
-			if (line.contains("End"))break;
+			if (line.contains("Edges"))
+			{
+				break;
+			}
 			//维度 维度一致的第几个 单元类型 单元数
 			QStringList info = line.split(' ', QString::SkipEmptyParts);
-			if (info.size() != 5)continue;
+			if (info.size() != 4)continue;
 			bool readOK = this->readElement(info);
 			count++;
 			if (!readOK)
@@ -44,7 +47,7 @@ namespace Tmsh
 		}
 
 		return true;
-    }
+	}
 
     bool FITKTmshAdaptorElements::adaptW()
     {

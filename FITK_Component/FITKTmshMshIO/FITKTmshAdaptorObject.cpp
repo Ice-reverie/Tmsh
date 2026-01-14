@@ -12,8 +12,8 @@ namespace Tmsh
         return "FITKTmshAdaptorObject";
     }
 
-    bool FITKTmshAdaptorObject::adaptR()
-    {
+	bool FITKTmshAdaptorObject::adaptR()
+	{
 		if (!_dataObj) return false;
 		bool readOK = true;
 		//开始读取
@@ -29,9 +29,10 @@ namespace Tmsh
 			if (line == "Vertices")
 			{
 				readOK &= this->readNodes();
+				line = _reader->previousLine();
 			}
-			//解析单元
-			else if (line == "Tetrahedra")
+			//解析面
+			if (line == "Triangles")
 			{
 				readOK &= this->readElements();
 			}
@@ -41,7 +42,7 @@ namespace Tmsh
 			}
 		}
 		return readOK;
-    }
+	}
 
     bool FITKTmshAdaptorObject::adaptW()
     {

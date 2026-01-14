@@ -90,7 +90,7 @@ namespace GUI
         if (!meshSizeInfo || !meshGenerateAlgorithmInfo) return;
 
         /*
-        // Tmsh 专用算法信息（由 FITKMeshAlgorithmGeneratorTmshExec 创建）
+        // Tmsh 专用算法信息（由 FITKMeshAlgorithmGeneratorTmshExec 创建�?
         Tmsh::FITKTmshGlobalMeshGenerateAlgorithmInfo* tmshAlg =
             dynamic_cast<Tmsh::FITKTmshGlobalMeshGenerateAlgorithmInfo*>(meshGenerateAlgorithmInfo);
         if (tmshAlg)
@@ -112,7 +112,7 @@ namespace GUI
 
 
         /*
-        // 将界面参数写回 Tmsh 算法信息
+        // 将界面参数写�? Tmsh 算法信息
         Tmsh::FITKTmshGlobalMeshGenerateAlgorithmInfo* tmshAlg =
             dynamic_cast<Tmsh::FITKTmshGlobalMeshGenerateAlgorithmInfo*>(meshGenerateAlgorithmInfo);
         if (tmshAlg)
@@ -145,7 +145,7 @@ namespace GUI
     }
 
 
-    // 实现详细参数按钮点击槽函数
+    // 实现详细参数按钮点击槽函�?
     void GUITetGenSettings::on_pushButton_Help_clicked()
     {
         GUITetGenHelp *_detailedDlg = new GUITetGenHelp;
