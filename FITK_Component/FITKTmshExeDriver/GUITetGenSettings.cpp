@@ -21,8 +21,8 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QWidget>
-
 #include <QDebug>
+#include <QDir>
 
 namespace GUI
 {
@@ -39,6 +39,10 @@ namespace GUI
         Qt::WindowFlags flags = windowFlags();
         flags &= ~Qt::WindowContextHelpButtonHint;
         setWindowFlags(flags);
+
+        QString currentPath = QDir::currentPath();
+        _ui->lineEdit_FilePath->setText(currentPath);
+
         this->init();
     }
 
@@ -51,6 +55,10 @@ namespace GUI
         Qt::WindowFlags flags = windowFlags();
         flags &= ~Qt::WindowContextHelpButtonHint;
         setWindowFlags(flags);
+
+        QString currentPath = QDir::currentPath();
+        _ui->lineEdit_FilePath->setText(currentPath);
+
         this->init();
     }
 
@@ -146,7 +154,11 @@ namespace GUI
 
     void GUITetGenSettings::on_pushButton_Browse_clicked()
     {
-        QString fileName = QFileDialog::getOpenFileName(nullptr, "打开文件", "", "所有文件 (*.*)");
+        QString filePath = QFileDialog::getOpenFileName(nullptr, "选择文件", _ui->lineEdit_FilePath->text(), "mesh文件 (*.surf.mesh)");
+        if(!filePath.isEmpty())
+        {
+            _ui->lineEdit_FilePath->setText(filePath);
+        }
     }
 }
 

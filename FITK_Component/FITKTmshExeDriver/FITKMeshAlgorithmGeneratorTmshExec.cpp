@@ -22,7 +22,7 @@ namespace Tmsh
         info->setAdaptSmoothIter(30);
 
 
-        info->setTetgenSwitches("./output/Tmsh/geometryFile.surf.mesh");
+        //info->setTetgenSwitches("./output/Tmsh/geometryFile.surf.mesh");
 
         return info;
     }
