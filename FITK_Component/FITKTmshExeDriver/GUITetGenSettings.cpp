@@ -40,8 +40,10 @@ namespace GUI
         flags &= ~Qt::WindowContextHelpButtonHint;
         setWindowFlags(flags);
 
-        QString currentPath = QDir::currentPath();
-        _ui->lineEdit_FilePath->setText(currentPath);
+        QString appRunDir = QDir::currentPath();
+        QString tempPath = QDir(appRunDir).filePath("../Tmsh");
+        QString defaultPath = QDir::cleanPath(tempPath);
+        _ui->lineEdit_FilePath->setText(defaultPath);
 
         this->init();
     }
@@ -56,8 +58,10 @@ namespace GUI
         flags &= ~Qt::WindowContextHelpButtonHint;
         setWindowFlags(flags);
 
-        QString currentPath = QDir::currentPath();
-        _ui->lineEdit_FilePath->setText(currentPath);
+        QString appRunDir = QDir::currentPath();
+        QString tempPath = QDir(appRunDir).filePath("../Tmsh");
+        QString defaultPath = QDir::cleanPath(tempPath);
+        _ui->lineEdit_FilePath->setText(defaultPath);
 
         this->init();
     }
@@ -154,7 +158,22 @@ namespace GUI
 
     void GUITetGenSettings::on_pushButton_Browse_clicked()
     {
-        QString filePath = QFileDialog::getOpenFileName(nullptr, "选择文件", _ui->lineEdit_FilePath->text(), "mesh文件 (*.surf.mesh)");
+        QString currentPath = _ui->lineEdit_FilePath->text();
+        QString targetFolderName = "Tmsh";
+        QString defaultOpenDir;
+        QFileInfo fileInfo(currentPath);
+        if(fileInfo.isFile())
+        {
+            QDir parentDir = fileInfo.dir();
+            defaultOpenDir = parentDir.filePath("../" + targetFolderName);
+        }
+        else
+        {
+            QDir currentDir(currentPath);
+            defaultOpenDir = currentDir.filePath("../" + targetFolderName);
+        }
+
+        QString filePath = QFileDialog::getOpenFileName(nullptr, "选择文件", defaultOpenDir, "mesh文件 (*.surf.mesh)");
         if(!filePath.isEmpty())
         {
             _ui->lineEdit_FilePath->setText(filePath);
