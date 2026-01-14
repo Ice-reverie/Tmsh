@@ -44,7 +44,24 @@ FITKMesherDriverTmshExec::~FITKMesherDriverTmshExec() = default;
 void FITKMesherDriverTmshExec::startMesher(QStringList info)
 {
     Q_UNUSED(info)
-    runMesher(1);
+
+    int method = 0;
+    if (!this->getValue("Method").isNull())
+    {
+        method = this->getValueT<int>("Method");
+    }
+    if (method == 0)
+    {
+        this->buildSingleStageArgs();
+    }
+    else if (method == 1)
+    {
+        this->tmshMeshGenSetting();
+    }
+    else if (method == 2)
+    {
+        this->tetgenMeshGenSetting();
+    }
 }
 
 void FITKMesherDriverTmshExec::stopMesher(QStringList info)
@@ -53,15 +70,6 @@ void FITKMesherDriverTmshExec::stopMesher(QStringList info)
     //TODO
 }
 
-
-void FITKMesherDriverTmshExec::runMesher(int method)
-{
-    if (method == 1) {
-        tmshMeshGenSetting();
-    } else if (method == 2) {
-        tetgenMeshGenSetting();
-    }
-}
 
 void FITKMesherDriverTmshExec::tmshMeshGenSetting()
 {
