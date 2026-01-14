@@ -33,9 +33,6 @@ protected:
     void tmshMeshGenSetting();
     void tetgenMeshGenSetting();
 
-    /* 选择算法后统一路由 */
-    void runMesher(int method);
-
 private slots:
     /* 单阶段完成回调 */
     void onSingleStageFinished();
@@ -52,6 +49,5 @@ private:
     void startMeshGenerationOnce();
     QStringList buildSingleStageArgs() const;
 };
-} // namespace Tmsh
-
+}
 #endif // __FITKMESHERDRIVERTMSHEXEC_H___
