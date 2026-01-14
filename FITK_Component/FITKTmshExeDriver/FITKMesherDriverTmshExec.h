@@ -1,6 +1,6 @@
 ﻿/**********************************************************************
  * @file   FITKMesherDriverTmshExec.h
- * @brief  Tmsh Exec网格驱动器
+ * @brief  Tmsh Exec 网格驱动器（单阶段版，同时支持 Tmsh & TetGen）
  * @date   2025-12-22
  *********************************************************************/
 #ifndef __FITKMESHERDRIVERTMSHEXEC_H___
@@ -18,35 +18,40 @@ namespace GUI
 
 namespace Tmsh
 {
-	class FITKMesherDriverTmshExec : public Interface::FITKAbstractMesherDriver
-	{
-		Q_OBJECT
-	public:
-		explicit FITKMesherDriverTmshExec();
-		virtual ~FITKMesherDriverTmshExec();
+class FITKMesherDriverTmshExec : public Interface::FITKAbstractMesherDriver
+{
+    Q_OBJECT
+public:
+    explicit FITKMesherDriverTmshExec();
+    ~FITKMesherDriverTmshExec();
 
-		virtual void startMesher(QStringList info = QStringList()) override;
-		virtual void stopMesher(QStringList info = QStringList()) override;
+    void startMesher(QStringList info = QStringList()) override;
+    void stopMesher(QStringList info = QStringList()) override;
 
-    protected:
-        void tmshMeshGenSetting();
-        void tetgenMeshGenSetting();
+protected:
+    /* 弹窗入口 */
+    void tmshMeshGenSetting();
+    void tetgenMeshGenSetting();
 
-        void startTmshMeshGenerationDriven(int stage);
-        QStringList buildStageArgs(int stage) const;
+    /* 选择算法后统一路由 */
+    void runMesher(int method);
 
-	private slots:
-		void writerModelFileDriven();
-		void onSingleStageFinished();
+private slots:
+    /* 单阶段完成回调 */
+    void onSingleStageFinished();
 
-    private:
-        bool _pipelineEnabled{ false };
-        int _runningStage{ 0 }; // 0: idle, 1: stage1, 2: stage2
-        QPointer<GUI::GUITmshSettings> _settingsDialog{};
+private:
+    /* 界面缓存 */
+    QPointer<GUI::GUITmshSettings>   _settingsDialog;
+    QPointer<GUI::GUITetGenSettings> _tetgenSettingsDialog;
 
-        QPointer<GUI::GUITetGenSettings> _tetgenSettingsDialog{};
+    /* 单阶段公共逻辑 */
+    void writerModelFileTmshSingle();
+    void writerModelFileTetGenSingle();
+    void exportGeometryAndSetPaths();
+    void startMeshGenerationOnce();
+    QStringList buildSingleStageArgs() const;
+};
+} // namespace Tmsh
 
-    };
-}
-
-#endif
+#endif // __FITKMESHERDRIVERTMSHEXEC_H___
