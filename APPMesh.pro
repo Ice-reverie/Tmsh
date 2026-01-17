@@ -44,3 +44,4 @@ OperatorsModel.depends = OperatorsInterface GUIFrame GUIDialog HDF5IO
 OperatorsGUI.depends = OperatorsInterface GUIFrame GraphData ModelData
 FITK_Plugins.depends = GUIFrame OperatorsInterface GraphData ModelData FITK_Component
 MeshApp.depends = OperatorsModel OperatorsGUI GUIFrame HDF5IO
+

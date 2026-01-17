@@ -40,15 +40,15 @@ namespace GUI
         Qt::WindowFlags flags = windowFlags();
         flags &= ~Qt::WindowContextHelpButtonHint;
         setWindowFlags(flags);
+        
         /*
         QString appRunDir = QDir::currentPath();
         QString tempPath = QDir(appRunDir).filePath("../Tmsh");
         QString defaultPath = QDir::cleanPath(tempPath);
         _ui->lineEdit_FilePath->setText(defaultPath);
         */
-
-        // ========== 核心：关联QProcess的信号槽 ==========
-        // 1. 命令执行完成后触发的信号
+        
+        // 命令执行完成后触发的信号
         connect(_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
                 this, [=](int exitCode, QProcess::ExitStatus exitStatus)
         {
@@ -68,10 +68,8 @@ namespace GUI
             }
             // 恢复按钮可用
             _ui->pushButton_OK->setEnabled(true);
-            });
-
-
-
+        });
+        
         this->init();
     }
 
@@ -84,13 +82,14 @@ namespace GUI
         Qt::WindowFlags flags = windowFlags();
         flags &= ~Qt::WindowContextHelpButtonHint;
         setWindowFlags(flags);
+        
         /*
         QString appRunDir = QDir::currentPath();
         QString tempPath = QDir(appRunDir).filePath("../Tmsh");
         QString defaultPath = QDir::cleanPath(tempPath);
         _ui->lineEdit_FilePath->setText(defaultPath);
         */
-
+        
         connect(_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
                 this, [=](int exitCode, QProcess::ExitStatus exitStatus)
         {
@@ -108,8 +107,7 @@ namespace GUI
             // 恢复按钮可用
             _ui->pushButton_OK->setEnabled(true);
             });
-
-
+        
 
         this->init();
     }
@@ -134,13 +132,11 @@ namespace GUI
 
     void GUITetGenSettings::init()
     {
-
         setWindowTitle(tr("TetGen Settings"));
 
         Interface::FITKGlobalMeshSizeInfo* meshSizeInfo = Interface::FITKMeshGenInterface::getInstance()->getGlobalMeshSizeInfo(kMesherKey);
         Interface::FITKGlobalMeshGenerateAlgorithmInfo* meshGenerateAlgorithmInfo = Interface::FITKMeshGenInterface::getInstance()->getGlobalMeshGenerateAlgorithmInfo(kMesherKey);
         if (!meshSizeInfo || !meshGenerateAlgorithmInfo) return;
-
     }
 
     void GUITetGenSettings::on_pushButton_OK_clicked()
@@ -157,8 +153,6 @@ namespace GUI
             _driver->setValue("virtualTopos", v);
         }
 
-
-        // 【前置校验】和同步版完全一致，复制过来即可
         QString userInputArgs = _ui->lineEdit_Option->text().trimmed();
         QString meshFilePath = _ui->lineEdit_FilePath->text().trimmed();
         if(userInputArgs.isEmpty()){ QMessageBox::warning(this, tr("Warning"), tr("Please enter the parameters!")); return; }
@@ -169,11 +163,8 @@ namespace GUI
         QString exePath = "D:/tetgen/tetgen.exe";
         QStringList cmdArgs;
         cmdArgs << userInputArgs << meshFilePath;
-        // ========== 核心：异步启动命令，不会阻塞界面 ==========
+        //异步启动命令，不会阻塞界面
         _process->start(exePath, cmdArgs);
-
-
-
 
         this->accept();
     }

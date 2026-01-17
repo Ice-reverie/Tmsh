@@ -13,6 +13,7 @@
 #include "ui_GUITetGenHelp.h"
 
 #include <QWidget>
+#include <QProcess>
 
 namespace Ui { class GUITetGenSettings; }
 
@@ -46,6 +47,8 @@ namespace GUI
         Interface::FITKAbstractMesherDriver* _driver{};
         QList<Interface::VirtualShape> _virtualTopos{};
         GUITetGenSettings* _detailedDlg{};
+
+        QProcess *_process;
     };
 }
 
