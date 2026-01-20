@@ -90,6 +90,13 @@ namespace Tmsh
 
 
         void setFilePath(const char* path);
+
+
+        void setOption(const QString& tet);
+        QString getOption() const;
+        bool hasOption() const;
+        void clearOption();
+
     };
 }
 

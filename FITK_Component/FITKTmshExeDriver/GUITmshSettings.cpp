@@ -108,7 +108,7 @@ namespace GUI
             _ui->lineEdit_TetgenSwitches->setText(QString::number(tmshAlg->getTetgenSwitches(), 'g', 16));
             _ui->lineEdit_NormalTol->setText(QString::number(tmshAlg->getNormalTol(), 'g', 16));
             _ui->lineEdit_MinAngle->setText(QString::number(tmshAlg->getMinAngle(), 'g', 16));
-}
+        }
     }
 
     void GUITmshSettings::pickFinishedOper(int pickType, int objectId, QHash<QString, void*> objInfo)

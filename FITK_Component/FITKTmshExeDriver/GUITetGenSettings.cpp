@@ -40,15 +40,15 @@ namespace GUI
         Qt::WindowFlags flags = windowFlags();
         flags &= ~Qt::WindowContextHelpButtonHint;
         setWindowFlags(flags);
+        
         /*
         QString appRunDir = QDir::currentPath();
         QString tempPath = QDir(appRunDir).filePath("../Tmsh");
         QString defaultPath = QDir::cleanPath(tempPath);
         _ui->lineEdit_FilePath->setText(defaultPath);
         */
-
-        // ========== 核心：关联QProcess的信号槽 ==========
-        // 1. 命令执行完成后触发的信号
+        
+        // 锟斤拷锟斤拷执锟斤拷锟斤拷锟缴后触凤拷锟斤拷锟脚猴拷
         connect(_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
                 this, [=](int exitCode, QProcess::ExitStatus exitStatus)
         {
@@ -64,14 +64,12 @@ namespace GUI
             }
             else
             {
-                QMessageBox::critical(this, tr("Faliure"), tr("Failure in processing：%1").arg(errorLog), QMessageBox::Ok);
+                QMessageBox::critical(this, tr("Faliure"), tr("Failure in processing锟斤拷%1").arg(errorLog), QMessageBox::Ok);
             }
-            // 恢复按钮可用
+            // 锟街革拷锟斤拷钮锟斤拷锟斤拷
             _ui->pushButton_OK->setEnabled(true);
-            });
-
-
-
+        });
+        
         this->init();
     }
 
@@ -84,13 +82,14 @@ namespace GUI
         Qt::WindowFlags flags = windowFlags();
         flags &= ~Qt::WindowContextHelpButtonHint;
         setWindowFlags(flags);
+        
         /*
         QString appRunDir = QDir::currentPath();
         QString tempPath = QDir(appRunDir).filePath("../Tmsh");
         QString defaultPath = QDir::cleanPath(tempPath);
         _ui->lineEdit_FilePath->setText(defaultPath);
         */
-
+        
         connect(_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
                 this, [=](int exitCode, QProcess::ExitStatus exitStatus)
         {
@@ -103,13 +102,12 @@ namespace GUI
             }
             else
             {
-                QMessageBox::critical(this, tr("Faliure"), tr("Failure in processing：%1").arg(errorLog), QMessageBox::Ok);
+                QMessageBox::critical(this, tr("Faliure"), tr("Failure in processing锟斤拷%1").arg(errorLog), QMessageBox::Ok);
             }
-            // 恢复按钮可用
+            // 锟街革拷锟斤拷钮锟斤拷锟斤拷
             _ui->pushButton_OK->setEnabled(true);
             });
-
-
+        
 
         this->init();
     }
@@ -134,13 +132,19 @@ namespace GUI
 
     void GUITetGenSettings::init()
     {
-
         setWindowTitle(tr("TetGen Settings"));
 
         Interface::FITKGlobalMeshSizeInfo* meshSizeInfo = Interface::FITKMeshGenInterface::getInstance()->getGlobalMeshSizeInfo(kMesherKey);
         Interface::FITKGlobalMeshGenerateAlgorithmInfo* meshGenerateAlgorithmInfo = Interface::FITKMeshGenInterface::getInstance()->getGlobalMeshGenerateAlgorithmInfo(kMesherKey);
         if (!meshSizeInfo || !meshGenerateAlgorithmInfo) return;
 
+        // Tmsh 专用算法信息（由 FITKMeshAlgorithmGeneratorTmshExec 创建）
+        Tmsh::FITKTmshGlobalMeshGenerateAlgorithmInfo* tmshAlg =
+            dynamic_cast<Tmsh::FITKTmshGlobalMeshGenerateAlgorithmInfo*>(meshGenerateAlgorithmInfo);
+        if (tmshAlg)
+        {
+            _ui->lineEdit_Option->text().trimmed();
+        }
     }
 
     void GUITetGenSettings::on_pushButton_OK_clicked()
@@ -157,23 +161,39 @@ namespace GUI
             _driver->setValue("virtualTopos", v);
         }
 
-
-        // 【前置校验】和同步版完全一致，复制过来即可
-        QString userInputArgs = _ui->lineEdit_Option->text().trimmed();
+        QString inputContent = _ui->lineEdit_Option->text().trimmed();
         QString meshFilePath = _ui->lineEdit_FilePath->text().trimmed();
-        if(userInputArgs.isEmpty()){ QMessageBox::warning(this, tr("Warning"), tr("Please enter the parameters!")); return; }
-        if(meshFilePath.isEmpty() || !QFile::exists(meshFilePath)){ QMessageBox::warning(this, tr("Warning"), tr("File does not exist!")); return; }
-        // 禁用OK按钮，防止重复点击
+        QFileInfo meshFileInfo(meshFilePath);
+
+        if(inputContent.isEmpty())
+        {
+            QMessageBox::warning(this, tr("Warning"), tr("Please enter the parameters!"));
+            return;
+        }
+        if(meshFilePath.isEmpty() || !meshFileInfo.exists() || !meshFileInfo.isFile())
+        {
+            QMessageBox::warning(this, tr("Warning"), tr("File does not exist or is not a file!"));
+            return;
+        }
+
+        _driver->setValue("tetgenOptions", inputContent);
+
         _ui->pushButton_OK->setEnabled(false);
-        // 配置命令和参数
+
+        if (_process == nullptr)
+        {
+            _process = new QProcess(this);
+        }
+
+        _process->disconnect();
+        _process->close();
+
         QString exePath = "D:/tetgen/tetgen.exe";
-        QStringList cmdArgs;
-        cmdArgs << userInputArgs << meshFilePath;
-        // ========== 核心：异步启动命令，不会阻塞界面 ==========
+        QString optionStr = _driver->getValue("tetgenOptions").toString();
+        QStringList cmdArgs = optionStr.split(" ", Qt::SkipEmptyParts);
+        cmdArgs << meshFilePath;
+
         _process->start(exePath, cmdArgs);
-
-
-
 
         this->accept();
     }
