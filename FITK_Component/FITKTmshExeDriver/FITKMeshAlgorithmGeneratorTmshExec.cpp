@@ -21,8 +21,9 @@ namespace Tmsh
         info->setAdaptIter(3);
         info->setAdaptSmoothIter(30);
 
+        //info->setTetgenSwitches("./output/Tmsh/geometryFile.mesh");
 
-        //info->setTetgenSwitches("./output/Tmsh/geometryFile.surf.mesh");
+        info->setOption("");
 
         return info;
     }

@@ -22,6 +22,9 @@ namespace Tmsh
 
         constexpr const char* kFilePathKey = "Tmsh.FilePath";
 
+        constexpr const char* kOptionKey = "Tmsh.Option";
+
+
 
         bool isSet(const Core::FITKVarientParams& params, const char* key)
         {
@@ -295,6 +298,32 @@ namespace Tmsh
     {
         this->setValue(kFilePathKey, path);
     }
+
+
+    void FITKTmshGlobalMeshGenerateAlgorithmInfo::setOption(const QString& tet)
+    {
+        this->setValue(kTetgenSwitchesKey, tet);
+    }
+
+    QString FITKTmshGlobalMeshGenerateAlgorithmInfo::getOption() const
+    {
+        return this->getValueT<QString>(kTetgenSwitchesKey);
+    }
+
+    bool FITKTmshGlobalMeshGenerateAlgorithmInfo::hasOption() const
+    {
+        return isSet(*this, kTetgenSwitchesKey);
+    }
+
+    void FITKTmshGlobalMeshGenerateAlgorithmInfo::clearOption()
+    {
+        this->removeVarient(kTetgenSwitchesKey);
+    }
+
+
+
+
+
 
 
 }
