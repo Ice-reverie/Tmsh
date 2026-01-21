@@ -233,7 +233,7 @@ namespace GUI
             defaultOpenDir = currentDir.filePath("../" + targetFolderName);
         }
 
-        QString filePath = QFileDialog::getOpenFileName(nullptr, "Import Model File", defaultOpenDir, "Geometry File(*.surf.mesh)");
+        QString filePath = QFileDialog::getOpenFileName(nullptr, "Import Model File", defaultOpenDir, "Geometry File(*.mesh)");
         if(!filePath.isEmpty())
         {
             _ui->lineEdit_FilePath->setText(filePath);
