@@ -82,7 +82,7 @@ namespace Tmsh
     {
 		Interface::FITKUnstructuredMesh* meshObj = dynamic_cast<Interface::FITKUnstructuredMesh*>(_dataObj);
 		FITKTmshMshIOReader* reader = dynamic_cast<FITKTmshMshIOReader*>(_reader);
-		if (!meshObj || !reader || info.size() != 5) return false;
+		if (!meshObj || !reader || info.size() != 4) return false;
 		FITKTmshMshIOReaderTool* tool = reader->getReaderTool();
 		if (!tool) return false;
 		bool ok = false;
@@ -91,7 +91,7 @@ namespace Tmsh
 		//获取单元类型
 		int nodeNum = info.size() - 1;
 		QList<int> nodeIndexs;
-		int type = this->getElementType(4, nodeNum, nodeIndexs);
+		int type = this->getElementType(2, nodeNum, nodeIndexs);
 		//获取单元节点id
 		QList<int> nodeIDs;
 		for (int index : nodeIndexs)

@@ -35,6 +35,7 @@ win32{
         -lGUIWidget \ 
         -lModelData \
         -lOperatorsInterface \
+        -lFITKInterfaceMeshGen \
         -lGraphDataPick \
         -lHDF5IO \
         -lGUIDialog \
@@ -60,6 +61,7 @@ win32{
         -lGUIWidget \ 
         -lModelData \
         -lOperatorsInterface \
+        -lFITKInterfaceMeshGen \
         -lGraphDataPick \
         -lHDF5IO \
         -lGUIDialog \

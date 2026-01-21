@@ -31,7 +31,8 @@ namespace Tmsh
 			}
 			//维度 维度一致的第几个 是否有参数坐标 节点数
 			QStringList info = line.split(' ', QString::SkipEmptyParts);
-			if (info.size() != 4)continue;
+			//if (info.size() != 3/*4*/)continue;
+			if (info.size() < 3)continue;
 			bool readOK = this->readNode(info);
 			if (!readOK)
 				return false;
@@ -75,7 +76,8 @@ namespace Tmsh
     {
 		Interface::FITKUnstructuredMesh* meshObj = dynamic_cast<Interface::FITKUnstructuredMesh*>(_dataObj);
 		FITKTmshMshIOReader* reader = dynamic_cast<FITKTmshMshIOReader*>(_reader);
-		if (!meshObj || !reader || info.size() != 4) return false;
+		//if (!meshObj || !reader || info.size() != 3/*4*/) return false;
+		if (!meshObj || !reader || info.size() < 3) return false;
 		FITKTmshMshIOReaderTool* tool = reader->getReaderTool();
 		if (!tool) return false;
 		bool ok = false;

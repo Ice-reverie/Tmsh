@@ -2,6 +2,7 @@ HEADERS += \
     $$PWD/OperatorsModelAPI.h \
     $$PWD/OperatorModelInterface.h \
     $$PWD/OperatorImportGeometry.h \
+    $$PWD/OperatorImportMesh.h \
     $$PWD/OperatorsOpen.h \
     $$PWD/OperatorsSave.h \
     $$PWD/OperatorsGeoGroup.h \
@@ -12,6 +13,7 @@ HEADERS += \
 SOURCES += \
     $$PWD/OperatorModelInterface.cpp \
     $$PWD/OperatorImportGeometry.cpp \
+    $$PWD/OperatorImportMesh.cpp \
     $$PWD/OperatorsOpen.cpp \
     $$PWD/OperatorsSave.cpp \
     $$PWD/OperatorsGeoGroup.cpp \

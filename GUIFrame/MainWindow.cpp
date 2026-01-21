@@ -181,6 +181,9 @@ namespace GUI
 
         action = createAction(tr("Import Geometry"), "actionImportGeometry", QIcon(":/icons/Import.svg"));
         panelAddAction(pannel, action, SARibbonPannelItem::Large);
+
+		action = createAction(tr("Import Mesh"), "actionImportMesh", QIcon(":/icons/Import.svg"));
+		panelAddAction(pannel, action, SARibbonPannelItem::Large);
         
         // 输出
         SARibbonPannel* pannelExport = gategory->addPannel(tr("Export"));
