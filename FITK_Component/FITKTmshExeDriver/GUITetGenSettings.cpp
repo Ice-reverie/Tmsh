@@ -107,7 +107,6 @@ namespace GUI
             // 锟街革拷锟斤拷钮锟斤拷锟斤拷
             _ui->pushButton_OK->setEnabled(true);
             });
-        
 
         this->init();
     }
@@ -161,11 +160,18 @@ namespace GUI
             _driver->setValue("virtualTopos", v);
         }
 
-        QString inputContent = _ui->lineEdit_Option->text().trimmed();
+        QString userInputOption = _ui->lineEdit_Option->text().trimmed();
         QString meshFilePath = _ui->lineEdit_FilePath->text().trimmed();
         QFileInfo meshFileInfo(meshFilePath);
 
-        if(inputContent.isEmpty())
+        //提取带后缀的文件名存储到全局接口
+        if(meshFileInfo.exists() && meshFileInfo.isFile())
+        {
+            QString fileName = meshFileInfo.fileName();
+            Interface::FITKMeshGenInterface::setMeshFileName(fileName);
+        }
+
+        if(userInputOption.isEmpty())
         {
             QMessageBox::warning(this, tr("Warning"), tr("Please enter the parameters!"));
             return;
@@ -176,7 +182,7 @@ namespace GUI
             return;
         }
 
-        _driver->setValue("tetgenOptions", inputContent);
+        _driver->setValue("tetgenOptions", userInputOption);
 
         _ui->pushButton_OK->setEnabled(false);
 
@@ -189,11 +195,22 @@ namespace GUI
         _process->close();
 
         QString exePath = "D:/tetgen/tetgen.exe";
-        QString optionStr = _driver->getValue("tetgenOptions").toString();
-        QStringList cmdArgs = optionStr.split(" ", Qt::SkipEmptyParts);
-        cmdArgs << meshFilePath;
+        QString optionStr = _driver->getValue("tetgenOptions").toString().trimmed();
+        QStringList cmdArgs;
+        cmdArgs << "tetgen"
+                << optionStr.split(" ", Qt::SkipEmptyParts)
+                << meshFilePath;
 
         _process->start(exePath, cmdArgs);
+
+        /*   // 注意绝对路径要 "D:/tetgen/tetgen.exe"
+        QFileInfo tetGenInfo(exePath);
+        if (!tetGenInfo.exists() || !tetGenInfo.isFile())
+        {
+            qCritical() << "TetGen executable not found at:" << exePath;
+            return;
+        }
+        */
 
         this->accept();
     }

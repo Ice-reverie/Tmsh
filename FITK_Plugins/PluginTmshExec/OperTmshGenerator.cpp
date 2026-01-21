@@ -71,7 +71,8 @@ namespace ModelOper
 		//获取工作目录
 		QString meshPath = FITKAPP->getTempDir(false, "");
 		QString meshFile = QString("%1/%2").arg(meshPath).arg("geometryFile");
-		QString meshName = "";
+        //QString meshName = "";
+        QString meshName = Interface::FITKMeshGenInterface::getMeshFileName();
 		if (meshName == "")
 		{
             meshName = "geometryFile.surf.mesh";

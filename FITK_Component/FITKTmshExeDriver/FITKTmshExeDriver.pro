@@ -78,21 +78,4 @@ unix{
     message("Linux FITKTmshExeDriver generated")
 }
 
-FORMS += \
-    GUIDetailedParameters.ui \
-    GUITetGenSettings.ui \
-    GUITetGenHelp.ui \
-
-
-HEADERS += \
-    GUIDetailedParameters.h \
-    GUITetGenSettings.h
-    GUITetGenHelp.h \
-
-
-SOURCES += \
-    GUIDetailedParameters.cpp \
-    GUITetGenSettings.cpp \
-    GUITetGenHelp.cpp \
-
 

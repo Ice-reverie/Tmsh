@@ -33,6 +33,10 @@ namespace Interface
     class FITKAbstractMeshAlgorithmInfoGenerator;
     class FITKAbstractMeshingParameter;
 
+
+    //class FITKMeshGenInterface;
+
+
     class FITKMeshGenInterfaceData;
     
     /**
@@ -212,6 +216,15 @@ namespace Interface
          * @date 2025-02-25
          */
         QHash<QString, FITKMeshGenInterfaceData*> _interfaceData{};
+
+
+
+    public:
+        static void setMeshFileName(const QString& fileName);
+        static QString getMeshFileName();
+    private:
+        static QString m_meshFileName;
+
     };
 
 
@@ -307,6 +320,8 @@ namespace Interface
          */
         FITKRegionGeometryRefineManager* _regionGeoRefineMgr{};
     };
+
+
 }
 
 

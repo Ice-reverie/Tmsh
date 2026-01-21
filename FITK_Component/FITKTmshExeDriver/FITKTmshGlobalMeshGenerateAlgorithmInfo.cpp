@@ -19,12 +19,8 @@ namespace Tmsh
         constexpr const char* kAdaptIterKey = "Tmsh.AdaptIter";
         constexpr const char* kAdaptSmoothIterKey = "Tmsh.AdaptSmoothIter";
 
-
         constexpr const char* kFilePathKey = "Tmsh.FilePath";
-
         constexpr const char* kOptionKey = "Tmsh.Option";
-
-
 
         bool isSet(const Core::FITKVarientParams& params, const char* key)
         {

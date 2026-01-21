@@ -387,6 +387,18 @@ namespace Interface
         _regionGeoRefineMgr = nullptr;
     }
 
+
+    QString FITKMeshGenInterface::m_meshFileName;
+    void FITKMeshGenInterface::setMeshFileName(const QString &fileName)
+    {
+        m_meshFileName = fileName;
+    }
+    QString FITKMeshGenInterface::getMeshFileName()
+    {
+        return m_meshFileName;
+    }
+
+
 }
 
 
