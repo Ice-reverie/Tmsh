@@ -74,7 +74,7 @@ namespace ModelOper
 		QString meshName = "";
 		if (meshName == "")
 		{
-            meshName = "geometryFile.mesh";
+            meshName = "geometryFile.surf.mesh";
 		}
 		QString meshFileProcessor = QString("%1/%2").arg(meshPath).arg(meshName);
 		//获取网格划分接口
