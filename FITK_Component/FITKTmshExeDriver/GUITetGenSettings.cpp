@@ -10,6 +10,7 @@
 #include "FITK_Kernel/FITKAppFramework/FITKAppFramework.h"
 #include "FITK_Kernel/FITKAppFramework/FITKSignalTransfer.h"
 #include "FITK_Kernel/FITKCore/FITKDataRepo.h"
+#include "FITK_Kernel/FITKAppFramework/FITKMessage.h"
 
 #include "FITK_Interface/FITKInterfaceGeometry/FITKAbsGeoCommand.h"
 
@@ -24,6 +25,7 @@
 #include <QDebug>
 #include <QDir>
 #include <QProcess>
+#include <QString>
 
 namespace GUI
 {
@@ -47,15 +49,23 @@ namespace GUI
         QString defaultPath = QDir::cleanPath(tempPath);
         _ui->lineEdit_FilePath->setText(defaultPath);
         */
-        
-        // ï¿½ï¿½ï¿½ï¿½Ö´ï¿½ï¿½ï¿½ï¿½ï¿½Éºó´¥·ï¿½ï¿½ï¿½ï¿½Åºï¿½
-        connect(_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
+
+        connect(_process, &QProcess::readyReadStandardOutput, this, &GUITetGenSettings::onReadyReadOutput);
+        connect(_process, &QProcess::readyReadStandardError, this, &GUITetGenSettings::onReadyReadError);
+
+                connect(_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
                 this, [=](int exitCode, QProcess::ExitStatus exitStatus)
         {
-            //QString outputLog = QString::fromUtf8(_process->readAllStandardOutput());
-            //QString errorLog = QString::fromUtf8(_process->readAllStandardError());
-            QString outputLog = QString::fromLocal8Bit(_process->readAllStandardOutput());
-            QString errorLog = QString::fromLocal8Bit(_process->readAllStandardError());
+            if (!_stdOutBuffer.isEmpty())
+            {
+                AppFrame::FITKMessageNormal(_stdOutBuffer.trimmed());
+                _stdOutBuffer.clear();
+            }
+            if (!_stdErrBuffer.isEmpty())
+            {
+                AppFrame::FITKMessageWarning(_stdErrBuffer.trimmed());
+                _stdErrBuffer.clear();
+            }
 
             if(exitCode == 0 && exitStatus == QProcess::NormalExit)
             {
@@ -64,9 +74,8 @@ namespace GUI
             }
             else
             {
-                QMessageBox::critical(this, tr("Faliure"), tr("Failure in processingï¿½ï¿½%1").arg(errorLog), QMessageBox::Ok);
+                QMessageBox::critical(this, tr("Faliure"), tr("Failure in processing: %1").arg(_stdErrBuffer), QMessageBox::Ok);
             }
-            // ï¿½Ö¸ï¿½ï¿½ï¿½Å¥ï¿½ï¿½ï¿½ï¿½
             _ui->pushButton_OK->setEnabled(true);
         });
         
@@ -89,12 +98,24 @@ namespace GUI
         QString defaultPath = QDir::cleanPath(tempPath);
         _ui->lineEdit_FilePath->setText(defaultPath);
         */
+
+        connect(_process, &QProcess::readyReadStandardOutput, this, &GUITetGenSettings::onReadyReadOutput);
+        connect(_process, &QProcess::readyReadStandardError, this, &GUITetGenSettings::onReadyReadError);
         
         connect(_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
                 this, [=](int exitCode, QProcess::ExitStatus exitStatus)
         {
-            QString outputLog = QString::fromLocal8Bit(_process->readAllStandardOutput());
-            QString errorLog = QString::fromLocal8Bit(_process->readAllStandardError());
+            if (!_stdOutBuffer.isEmpty())
+            {
+                AppFrame::FITKMessageNormal(_stdOutBuffer.trimmed());
+                _stdOutBuffer.clear();
+            }
+            if (!_stdErrBuffer.isEmpty())
+            {
+                AppFrame::FITKMessageWarning(_stdErrBuffer.trimmed());
+                _stdErrBuffer.clear();
+            }
+
             if(exitCode == 0 && exitStatus == QProcess::NormalExit)
             {
                 QMessageBox::information(this, tr("Success"), tr("Mesh file processing is complete!"), QMessageBox::Ok);
@@ -102,9 +123,8 @@ namespace GUI
             }
             else
             {
-                QMessageBox::critical(this, tr("Faliure"), tr("Failure in processingï¿½ï¿½%1").arg(errorLog), QMessageBox::Ok);
+                QMessageBox::critical(this, tr("Faliure"), tr("Failure in processing: %1").arg(_stdErrBuffer), QMessageBox::Ok);
             }
-            // ï¿½Ö¸ï¿½ï¿½ï¿½Å¥ï¿½ï¿½ï¿½ï¿½
             _ui->pushButton_OK->setEnabled(true);
             });
 
@@ -188,31 +208,55 @@ namespace GUI
 
         if (_process == nullptr)
         {
-            _process = new QProcess(this);
+           _process = new QProcess(this);
+           // ÖØÐÂÁ¬½ÓÐÅºÅ£¨Èç¹û_processÊÇÐÂ½¨µÄ£©
+           connect(_process, &QProcess::readyReadStandardOutput, this, &GUITetGenSettings::onReadyReadOutput);
+           connect(_process, &QProcess::readyReadStandardError, this, &GUITetGenSettings::onReadyReadError);
+           connect(_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
+                   this, [=](int exitCode, QProcess::ExitStatus exitStatus)
+           {
+               if(exitCode == 0 && exitStatus == QProcess::NormalExit)
+               {
+                   QMessageBox::information(this, tr("Success"), tr("Mesh file processing is complete!"), QMessageBox::Ok);
+                   this->accept();
+               }
+               else
+               {
+                   QMessageBox::critical(this, tr("Failure"), tr("Failure in processing: %1").arg(_stdErrBuffer), QMessageBox::Ok);
+                   _ui->pushButton_OK->setEnabled(true);
+               }    });
+            }
+        else
+        {
+            if (_process->state() != QProcess::NotRunning)
+            {
+                _process->kill();
+                _process->waitForFinished(1000);
+             }
+             _process->close();
         }
 
-        _process->disconnect();
-        _process->close();
-
+        // ×¢Òâ¾ø¶ÔÂ·¾¶Òª "D:/tetgen/tetgen.exe"
         QString exePath = "D:/tetgen/tetgen.exe";
+        QFileInfo tetGenInfo(exePath);
+        if (!tetGenInfo.exists() || !tetGenInfo.isFile())
+        {
+            QString errorMsg = tr("TetGen executable not found at: %1").arg(exePath);
+            qCritical() << errorMsg;
+            AppFrame::FITKMessageError(errorMsg);
+            QMessageBox::critical(this, tr("Error"), errorMsg, QMessageBox::Ok);
+            _ui->pushButton_OK->setEnabled(true);
+            return;
+        }
+
         QString optionStr = _driver->getValue("tetgenOptions").toString().trimmed();
         QStringList cmdArgs;
-        cmdArgs << "tetgen"
-                << optionStr.split(" ", Qt::SkipEmptyParts)
+        cmdArgs << optionStr.split(" ", Qt::SkipEmptyParts)
                 << meshFilePath;
 
         _process->start(exePath, cmdArgs);
 
-        /*   // ×¢Òâ¾ø¶ÔÂ·¾¶Òª "D:/tetgen/tetgen.exe"
-        QFileInfo tetGenInfo(exePath);
-        if (!tetGenInfo.exists() || !tetGenInfo.isFile())
-        {
-            qCritical() << "TetGen executable not found at:" << exePath;
-            return;
-        }
-        */
-
-        this->accept();
+        //this->accept();
     }
 
     void GUITetGenSettings::on_pushButton_Cancel_clicked()
@@ -254,6 +298,43 @@ namespace GUI
         if(!filePath.isEmpty())
         {
             _ui->lineEdit_FilePath->setText(filePath);
+        }
+    }
+
+    void GUITetGenSettings::onReadyReadOutput()
+    {
+        _stdOutBuffer += QString::fromLocal8Bit(_process->readAllStandardOutput());
+        const QChar cr = '\r';
+        const QChar lf = '\n';
+        int lineEndPos = -1;
+
+        while ((lineEndPos = _stdOutBuffer.indexOf(cr)) != -1 || (lineEndPos = _stdOutBuffer.indexOf(lf)) != -1)
+        {
+            QString line = _stdOutBuffer.left(lineEndPos).trimmed(); // trimmed() ¿ÉÑ¡£ºÈ¥³ýÊ×Î²¿Õ¸ñ/¿ÕÐÐ
+            _stdOutBuffer.remove(0, lineEndPos + 1);
+            if (!line.isEmpty())
+            {
+                AppFrame::FITKMessageNormal(line);
+            }
+        }
+    }
+
+    void GUITetGenSettings::onReadyReadError()
+    {
+        _stdErrBuffer += QString::fromLocal8Bit(_process->readAllStandardError());
+        const QChar cr = '\r';
+        const QChar lf = '\n';
+        int lineEndPos = -1;
+
+        while ((lineEndPos = _stdErrBuffer.indexOf(cr)) != -1 || (lineEndPos = _stdErrBuffer.indexOf(lf)) != -1)
+        {
+            QString line = _stdErrBuffer.left(lineEndPos).trimmed();
+            _stdErrBuffer.remove(0, lineEndPos + 1);
+
+            if (!line.isEmpty())
+            {
+                AppFrame::FITKMessageWarning(line);
+            }
         }
     }
 }
