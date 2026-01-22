@@ -29,6 +29,7 @@ win32{
         -lFITKInterfaceIO \
         -lFITKInterfaceModel \
         -lFITKInterfaceMesh \
+        -lFITKInterfaceMeshGen \
 
     Debug:CONFIG            +=  console
     Debug:DESTDIR         = ../../output/bin_d
@@ -44,6 +45,7 @@ win32{
         -lFITKInterfaceIO \
         -lFITKInterfaceModel \
         -lFITKInterfaceMesh \
+        -lFITKInterfaceMeshGen \
 
     message("Windows FITKTmshMshIO generated")
 }

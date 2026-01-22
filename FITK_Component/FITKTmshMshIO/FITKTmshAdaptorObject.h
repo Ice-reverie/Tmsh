@@ -41,6 +41,8 @@ namespace Tmsh
          */
         bool adaptR() override;
 
+		bool adaptRT();
+
         /**
          * @brief    适配器写出
          * @return   状态 true成功， false失败
@@ -73,6 +75,9 @@ namespace Tmsh
          * @date     2024-11-29
          */
         bool readNodes();
+
+		bool readTNodes();
+
         /**
          * @brief    读取单元信息
          * @return   bool
@@ -81,6 +86,7 @@ namespace Tmsh
          */
         bool readElements();
 
+		bool readTElements();
     private:
         /**
          * @brief  集合管理

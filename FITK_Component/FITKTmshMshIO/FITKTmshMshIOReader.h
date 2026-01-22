@@ -88,7 +88,7 @@ namespace Tmsh
          * @author   liuzhonghua (liuzhonghuaszch@163.com)
          * @date     2025-09-03
          */
-        bool read();
+        bool read(const int type);
 
     protected:
         /**

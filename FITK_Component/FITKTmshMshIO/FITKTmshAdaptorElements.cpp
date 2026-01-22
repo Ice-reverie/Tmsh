@@ -49,6 +49,31 @@ namespace Tmsh
 		return true;
 	}
 
+	bool FITKTmshAdaptorElements::adaptRT()
+	{
+		//获取网格数据对象
+		Interface::FITKUnstructuredMesh* meshObj = dynamic_cast<Interface::FITKUnstructuredMesh*>(_dataObj);
+		if (!meshObj || !_reader) return false;
+
+		QString line = _reader->nextLine().trimmed();
+		count = 1;
+		//开始读取节点
+		while (!_reader->atEnd())
+		{
+			QString line = _reader->readLine().trimmed();
+			if (line.contains("End"))break;
+			//维度 维度一致的第几个 单元类型 单元数
+			QStringList info = line.split(' ', QString::SkipEmptyParts);
+			if (info.size() != 5)continue;
+			bool readOK = this->readTElement(info);
+			count++;
+			if (!readOK)
+				return false;
+		}
+
+		return true;
+	}
+
     bool FITKTmshAdaptorElements::adaptW()
     {
         return true;
@@ -105,6 +130,34 @@ namespace Tmsh
 		tool->addElement(elemID, type, nodeIDs);
 		return true;
     }
+
+	bool FITKTmshAdaptorElements::readTElement(QStringList info)
+	{
+		Interface::FITKUnstructuredMesh* meshObj = dynamic_cast<Interface::FITKUnstructuredMesh*>(_dataObj);
+		FITKTmshMshIOReader* reader = dynamic_cast<FITKTmshMshIOReader*>(_reader);
+		if (!meshObj || !reader || info.size() != 5) return false;
+		FITKTmshMshIOReaderTool* tool = reader->getReaderTool();
+		if (!tool) return false;
+		bool ok = false;
+		//获取单元编号
+		int elemID = count;
+		//获取单元类型
+		int nodeNum = info.size() - 1;
+		QList<int> nodeIndexs;
+		int type = this->getElementType(4, nodeNum, nodeIndexs);
+		//获取单元节点id
+		QList<int> nodeIDs;
+		for (int index : nodeIndexs)
+		{
+			QString nodeIDStr = info.at(index);
+			int nodeID = nodeIDStr.toInt(&ok);
+			if (!ok) return false;
+			nodeIDs.append(nodeID);
+		}
+		//添加单元
+		tool->addElement(elemID, type, nodeIDs);
+		return true;
+	}
 
     bool FITKTmshAdaptorElements::readSetData(QList<int> elemIdList)
     {

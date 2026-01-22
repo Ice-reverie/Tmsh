@@ -98,12 +98,16 @@ namespace ModelOper
 
     void OperTmshGenerator::tetGenOper()
     {
-
-        //获取工作目录
-        QString meshPath = FITKAPP->getTempDir(false, "");
-        QString meshFile = QString("%1/%2").arg(meshPath).arg("geometryFile");
-        //QString meshFileProcessor = QString("%1/%2").arg(meshPath).arg("geometryFile.vol.mesh");
-        QString meshFileProcessor = QString("%1/%2").arg(meshPath).arg("geometryFile.surf.mesh");
+		//获取工作目录
+		QString meshPath = FITKAPP->getTempDir(false, "");
+		QString meshFile = QString("%1/%2").arg(meshPath).arg("geometryFile");
+		//QString meshName = "";
+		QString meshName = Interface::FITKMeshGenInterface::getMeshFileName();
+		if (meshName == "")
+		{
+			meshName = "geometryFile.surf.1.mesh";
+		}
+		QString meshFileProcessor = QString("%1/%2").arg(meshPath).arg(meshName);
         //获取网格划分接口
         Interface::FITKMeshGenInterface* mf = Interface::FITKMeshGenInterface::getInstance();
         if (!mf) return;

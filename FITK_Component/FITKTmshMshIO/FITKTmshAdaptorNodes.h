@@ -39,6 +39,8 @@ namespace Tmsh
          */
         bool adaptR() override;
 
+		bool adaptRT();
+
         /**
          * @brief    适配器写出
          * @return   状态 true成功， false失败

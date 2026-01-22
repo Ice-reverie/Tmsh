@@ -4,6 +4,9 @@
 #include "FITK_Kernel/FITKAppFramework/FITKMessage.h"
 #include "FITK_Interface/FITKInterfaceModel/FITKUnstructuredMesh.h"
 
+#include "FITK_Interface/FITKInterfaceMeshGen/FITKMeshGenInterface.h"
+#include "FITK_Interface/FITKInterfaceMeshGen/FITKAbstractMesherDriver.h"
+
 namespace Tmsh
 {
     void FITKTmshMshIOReader::setComponentManager(Interface::FITKComponentManager* componentManager)
@@ -18,7 +21,12 @@ namespace Tmsh
         bool ok = this->loadFile();
         if (!ok || !this->_data) return;
         _tool = new FITKTmshMshIOReaderTool(dynamic_cast<Interface::FITKUnstructuredMesh*>(_data), _componentMgr);
-        bool readOK = this->read();
+
+		Interface::FITKMeshGenInterface* mf = Interface::FITKMeshGenInterface::getInstance();
+		if (!mf) return;
+		Interface::FITKAbstractMesherDriver* mesher = mf->getMesherDriver("TmshExec");
+		int type = mesher->getValueT<int>("Method");
+        bool readOK = this->read(type);
         if (_resultMark != nullptr)
             *_resultMark = readOK;
         
@@ -63,7 +71,7 @@ namespace Tmsh
             break;
         }
     }
-    bool FITKTmshMshIOReader::read()
+    bool FITKTmshMshIOReader::read(const int type)
     {
         //读取数据
         auto adaptor = FITKIOADAPTORFACTORY->createT<FITKTmshAdaptorObject>("Tmsh", "FITKTmshAdaptorObject");
@@ -71,7 +79,15 @@ namespace Tmsh
         adaptor->setComponentManager(_componentMgr);
         adaptor->setFileReader(this);
         adaptor->setDataObject(this->_data);
-        bool readOK = adaptor->adaptR();
+		bool readOK = false;
+		if (type == 1)
+		{
+			readOK = adaptor->adaptR();
+		}
+		else if (type == 2)
+		{
+			readOK = adaptor->adaptRT();
+		}
         delete adaptor;
         return readOK;
     }
