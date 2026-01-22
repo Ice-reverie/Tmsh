@@ -35,12 +35,17 @@ namespace GUI
 
     private:
         void init();
+        QString _stdOutBuffer;
+        QString _stdErrBuffer;
 
     private slots:
         void on_pushButton_OK_clicked();
         void on_pushButton_Cancel_clicked();
         void on_pushButton_Help_clicked();
         void on_pushButton_Browse_clicked();
+
+        void onReadyReadOutput();
+        void onReadyReadError();
 
     private:
         Ui::GUITetGenSettings* _ui{};
