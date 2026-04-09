@@ -91,13 +91,6 @@ namespace GUI
         Qt::WindowFlags flags = windowFlags();
         flags &= ~Qt::WindowContextHelpButtonHint;
         setWindowFlags(flags);
-        
-        /*
-        QString appRunDir = QDir::currentPath();
-        QString tempPath = QDir(appRunDir).filePath("../Tmsh");
-        QString defaultPath = QDir::cleanPath(tempPath);
-        _ui->lineEdit_FilePath->setText(defaultPath);
-        */
 
         connect(_process, &QProcess::readyReadStandardOutput, this, &GUITetGenSettings::onReadyReadOutput);
         connect(_process, &QProcess::readyReadStandardError, this, &GUITetGenSettings::onReadyReadError);
@@ -236,7 +229,6 @@ namespace GUI
              _process->close();
         }
 
-        // 注意绝对路径要 "D:/tetgen/tetgen.exe"
         QString exePath = "D:/tetgen/tetgen.exe";
         QFileInfo tetGenInfo(exePath);
         if (!tetGenInfo.exists() || !tetGenInfo.isFile())
@@ -249,12 +241,12 @@ namespace GUI
             return;
         }
 
-        QString optionStr = _driver->getValue("tetgenOptions").toString().trimmed();
-        QStringList cmdArgs;
-        cmdArgs << optionStr.split(" ", Qt::SkipEmptyParts)
-                << meshFilePath;
+         QString optionStr = _driver->getValue("tetgenOptions").toString().trimmed();
+         QStringList cmdArgs;
+         cmdArgs << optionStr.split(" ", Qt::SkipEmptyParts)
+                 << meshFilePath;
 
-        _process->start(exePath, cmdArgs);
+         _process->start(exePath, cmdArgs);
 
         //this->accept();
     }
@@ -310,7 +302,7 @@ namespace GUI
 
         while ((lineEndPos = _stdOutBuffer.indexOf(cr)) != -1 || (lineEndPos = _stdOutBuffer.indexOf(lf)) != -1)
         {
-            QString line = _stdOutBuffer.left(lineEndPos).trimmed(); // trimmed() 可选：去除首尾空格/空行
+            QString line = _stdOutBuffer.left(lineEndPos).trimmed(); // trimmed()去除首尾空格/空行
             _stdOutBuffer.remove(0, lineEndPos + 1);
             if (!line.isEmpty())
             {

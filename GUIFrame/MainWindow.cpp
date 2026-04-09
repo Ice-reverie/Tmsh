@@ -27,6 +27,13 @@
 #include <QStatusBar>
 #include <QLabel>
 
+#include <QFile>
+#include <QTextStream>
+#include <QMessageBox>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QDir>
+
 
 namespace GUI
 {
@@ -210,6 +217,24 @@ namespace GUI
         SARibbonPannel* pannel = gategory->addPannel(tr("Help"));
         action = createAction(tr("License"), "actionLicense", QIcon(":/icons/License.svg"));
         panelAddAction(pannel, action, SARibbonPannelItem::Large);
+        connect(action, &QAction::triggered, this, &MainWindow::showLicenseFile);
+    }
+
+    void MainWindow::showLicenseFile()
+    {
+        QString appDir = QCoreApplication::applicationDirPath();
+        QDir dir(appDir);
+        dir.cdUp();
+        dir.cdUp();
+        QString filePath = dir.absoluteFilePath("License.txt");
+
+        if(!QFile::exists(filePath)) {
+            QMessageBox::warning(this, tr("Error"),
+                                tr("License file not found:\n%1").arg(filePath));
+            return;
+        }
+        // 使用系统默认程序打开文件
+        bool success = QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
     }
 
     void MainWindow::panelAddAction(SARibbonPannel * pannel, QAction * action, SARibbonPannelItem::RowProportion actionType)

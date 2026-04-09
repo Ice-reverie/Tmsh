@@ -105,7 +105,7 @@ namespace GUI
 
             _ui->lineEdit_MinLength->setText(QString::number(tmshAlg->getMinLength(), 'g', 16));
             _ui->lineEdit_MaxLength->setText(QString::number(tmshAlg->getMaxLength(), 'g', 16));
-            _ui->lineEdit_TetgenSwitches->setText(QString::number(tmshAlg->getTetgenSwitches(), 'g', 16));
+            // _ui->lineEdit_TetgenSwitches->setText(QString::number(tmshAlg->getTetgenSwitches(), 'g', 16));
             _ui->lineEdit_NormalTol->setText(QString::number(tmshAlg->getNormalTol(), 'g', 16));
             _ui->lineEdit_MinAngle->setText(QString::number(tmshAlg->getMinAngle(), 'g', 16));
         }
@@ -172,6 +172,7 @@ namespace GUI
         Interface::FITKGlobalMeshGenerateAlgorithmInfo* meshGenerateAlgorithmInfo = Interface::FITKMeshGenInterface::getInstance()->getGlobalMeshGenerateAlgorithmInfo(kMesherKey);
         if (meshGenerateAlgorithmInfo == nullptr) return;
 
+
         // 将界面参数写回 Tmsh 算法信息
         Tmsh::FITKTmshGlobalMeshGenerateAlgorithmInfo* tmshAlg =
             dynamic_cast<Tmsh::FITKTmshGlobalMeshGenerateAlgorithmInfo*>(meshGenerateAlgorithmInfo);
@@ -184,9 +185,11 @@ namespace GUI
             tmshAlg->setMinAngle(_ui->lineEdit_MinAngle->text().toDouble());
             tmshAlg->setNormalTol(_ui->lineEdit_NormalTol ->text().toDouble());
 
+            /*
             QString TetgenSwitchesText = _ui->lineEdit_TetgenSwitches->text().trimmed();
             const char* TetgenSwitchesCStr = TetgenSwitchesText.toUtf8().constData();
             tmshAlg->setTetgenSwitches(TetgenSwitchesCStr);
+            */
         }
 
         QVariant v = QVariant::fromValue(_virtualTopos);
@@ -194,6 +197,28 @@ namespace GUI
         {
             _driver->setValue("virtualTopos", v);
         }
+
+
+
+
+        bool isChecked = _ui->checkBox_tetSwitches->isChecked();
+        if (isChecked)
+        {
+             qDebug() << "selected sucessfully";
+             QString optionStr = _driver->getValue("tetgenOptions").toString().trimmed();
+             QStringList cmdArgs;
+             // cmdArgs << optionStr.split(" ", Qt::SkipEmptyParts)
+              //       << meshFilePath;
+
+             // _process->start(exePath, cmdArgs);
+       }
+       else
+       {
+             qDebug() << "not selected";
+             this->accept();
+       }
+
+
 
         this->accept();
     }

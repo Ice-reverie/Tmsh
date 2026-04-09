@@ -65,7 +65,7 @@
     <item>
      <widget class="QPushButton" name="pushButton_OK">
       <property name="text">
-       <string>Ok</string>
+       <string>Execute</string>
       </property>
      </widget>
     </item>
@@ -99,13 +99,6 @@
    </layout>
   </widget>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>QLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>FITK_Component/FITKWidget/FITKSciNotationLineEdit.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>

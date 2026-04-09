@@ -210,8 +210,8 @@ QStringList FITKMesherDriverTmshExec::buildSingleStageArgs() const
         args << "--max_length" << QString::number(tmshAlg->getMaxLength(), 'g', 16);
     if (tmshAlg->hasMeshDim())
         args << "--mesh_dim" << QString::number(tmshAlg->getMeshDim(), 'g', 16);
-    if (tmshAlg->hasTetgenSwitches())
-        args << "--tetgen_switches" << QString::number(tmshAlg->getTetgenSwitches(), 'g', 16);
+    // if (tmshAlg->hasTetgenSwitches())
+        // args << "--tetgen_switches" << QString::number(tmshAlg->getTetgenSwitches(), 'g', 16);
     if (tmshAlg->hasNormalTol())
         args << "--normal_tol" << QString::number(tmshAlg->getNormalTol(), 'g', 16);
     if (tmshAlg->hasMinAngle())

@@ -216,6 +216,10 @@ namespace GUI
          * @date 2025-03-05
          */
         RenderWidget* _renderWidget{};
+
+    private slots:
+        void showLicenseFile();
+
     };
 }
 

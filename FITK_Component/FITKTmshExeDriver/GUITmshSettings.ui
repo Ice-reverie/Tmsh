@@ -15,39 +15,68 @@
   </property>
   <layout class="QGridLayout" name="gridLayout_4">
    <item row="3" column="1">
-    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_MinAngle"/>
-   </item>
-   <item row="11" column="0" colspan="2">
-    <widget class="QPushButton" name="pushButton_Detailed">
-     <property name="text">
-      <string>Detailed Parameter</string>
-     </property>
-    </widget>
-   </item>
-   <item row="4" column="0">
-    <widget class="QLabel" name="label_maxLength">
-     <property name="text">
-      <string>Max Length</string>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="0">
     <widget class="QLabel" name="label_tangencyTolerance">
      <property name="text">
       <string>Tangent Tolerance</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="1">
-    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_TangencyTolerance"/>
+   <item row="16" column="1" colspan="2">
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QPushButton" name="pushButton_OK">
+       <property name="text">
+        <string>Execute</string>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="pushButton_Cancel">
+       <property name="text">
+        <string>Cancel</string>
+       </property>
+      </widget>
+     </item>
+    </layout>
    </item>
-   <item row="8" column="1">
-    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_TetgenSwitches"/>
+   <item row="4" column="1">
+    <widget class="QLabel" name="label_normalTol">
+     <property name="text">
+      <string>Normal Tolerance</string>
+     </property>
+    </widget>
    </item>
-   <item row="5" column="1">
+   <item row="6" column="1">
+    <widget class="QLabel" name="label_maxLength">
+     <property name="text">
+      <string>Max Length</string>
+     </property>
+    </widget>
+   </item>
+   <item row="15" column="1" colspan="2">
+    <widget class="QPushButton" name="pushButton_Detailed">
+     <property name="text">
+      <string>Detailed Parameter</string>
+     </property>
+    </widget>
+   </item>
+   <item row="7" column="2">
     <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_MinLength"/>
    </item>
-   <item row="0" column="0" colspan="2">
+   <item row="0" column="1" colspan="2">
     <widget class="QGroupBox" name="groupBox_PickModel">
      <property name="title">
       <string>PickModel</string>
@@ -80,77 +109,71 @@
      </layout>
     </widget>
    </item>
-   <item row="2" column="1">
-    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_NormalTol"/>
+   <item row="3" column="2">
+    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_TangencyTolerance"/>
    </item>
-   <item row="2" column="0">
-    <widget class="QLabel" name="label_normalTol">
+   <item row="7" column="1">
+    <widget class="QLabel" name="label_minLength">
      <property name="text">
-      <string>Normal Tolerance</string>
+      <string>Min Length</string>
      </property>
     </widget>
    </item>
-   <item row="8" column="0">
-    <widget class="QLabel" name="label_tetgenSwitches">
+   <item row="14" column="1">
+    <widget class="QCheckBox" name="checkBox_tetSwitches">
      <property name="text">
       <string>Tetgen Switches</string>
      </property>
     </widget>
    </item>
-   <item row="1" column="0">
-    <widget class="QLabel" name="label_tangencyTolerance">
-     <property name="text">
-      <string>Tangent Tolerance</string>
+   <item row="4" column="2">
+    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_NormalTol"/>
+   </item>
+   <item row="8" column="1" colspan="2">
+    <widget class="Line" name="line">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
      </property>
     </widget>
    </item>
-   <item row="3" column="0">
+   <item row="14" column="2">
+    <spacer name="horizontalSpacer_2">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>40</width>
+       <height>20</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="5" column="1">
     <widget class="QLabel" name="label_minAngle">
      <property name="text">
       <string>Min Angle</string>
      </property>
     </widget>
    </item>
-   <item row="4" column="1">
+   <item row="5" column="2">
+    <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_MinAngle"/>
+   </item>
+   <item row="6" column="2">
     <widget class="Comp::FITKSciNotationLineEdit" name="lineEdit_MaxLength"/>
    </item>
-   <item row="12" column="0" colspan="2">
-    <layout class="QHBoxLayout" name="horizontalLayout">
-     <item>
-      <widget class="QPushButton" name="pushButton_OK">
-       <property name="text">
-        <string>Ok</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <spacer name="horizontalSpacer">
-       <property name="orientation">
-        <enum>Qt::Horizontal</enum>
-       </property>
-       <property name="sizeHint" stdset="0">
-        <size>
-         <width>40</width>
-         <height>20</height>
-        </size>
-       </property>
-      </spacer>
-     </item>
-     <item>
-      <widget class="QPushButton" name="pushButton_Cancel">
-       <property name="text">
-        <string>Cancel</string>
-       </property>
-      </widget>
-     </item>
-    </layout>
-   </item>
-   <item row="5" column="0">
-    <widget class="QLabel" name="label_minLength">
-     <property name="text">
-      <string>Min Length</string>
+   <item row="1" column="1">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
      </property>
-    </widget>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

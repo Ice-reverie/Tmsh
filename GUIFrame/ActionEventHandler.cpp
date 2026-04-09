@@ -16,9 +16,15 @@ namespace GUI
 
         if (actOper == nullptr)
         {
-            //错误提示
-            QString error = QString("%1 Operator create failed !").arg(objName);
-            AppFrame::FITKMessageError(error);
+            if(objName == "actionLicense")
+            {
+            }
+            else
+            {
+                //错误提示
+                QString error = QString("%1 Operator create failed !").arg(objName);
+                AppFrame::FITKMessageError(error);
+            }
         }
         else
             actOper->actionTriggered();
