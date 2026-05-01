@@ -124,8 +124,8 @@ namespace AppFrame
         }
 
         //信号关联（避免多次 start() 重复连接导致重复触发）
-        disconnect(_process, SIGNAL(finished(int)), this, SIGNAL(sig_Finish()));
-        connect(_process, SIGNAL(finished(int)), this, SIGNAL(sig_Finish()));
+        disconnect(_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &FITKExecProgramDriver::sig_Finish);
+        connect(_process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, &FITKExecProgramDriver::sig_Finish, Qt::UniqueConnection);
 
         // Merge stdout/stderr to keep output ordering closer to terminal behavior.
         _process->setProcessChannelMode(QProcess::MergedChannels);

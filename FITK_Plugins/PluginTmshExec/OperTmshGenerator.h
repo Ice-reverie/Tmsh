@@ -1,6 +1,6 @@
 /**********************************************************************
  * @file   OperTmshGenerator.h
- * @brief  Tmsh网格生成操作器
+ * @brief  Tmsh网格生成操作�??
  * @date   2025-12-22
  *********************************************************************/
 #ifndef __OPERTMSHGENERATOR____
@@ -21,7 +21,7 @@ namespace ModelOper
         Q_OBJECT;
     public:
         explicit OperTmshGenerator() = default;
-        virtual ~OperTmshGenerator() = default;
+        virtual ~OperTmshGenerator();
 
         virtual bool execGUI() override;
         virtual bool execProfession() override;
@@ -30,6 +30,9 @@ namespace ModelOper
         void meshGenOper();
         void tetGenOper();
 
+        static bool _isMeshFinishedExecuting;
+        //bool _isMeshFinishedExecuting = false; // ����Ƿ�����ִ��meshGenFinished
+        
     private slots:
         void meshGenFinished();
         void meshClean();

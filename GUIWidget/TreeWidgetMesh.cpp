@@ -54,6 +54,9 @@ namespace GUI
         auto* meshManager = FITKAPP->getGlobalData()->getMeshData<ModelData::MeshManager>();
         if (!meshManager) return;
 
+        QSet<int> processedMeshIds;
+        int globalMeshIndex = 0;
+
         for (int mDataIdx = 0; mDataIdx < meshManager->getDataCount(); ++mDataIdx)
         {
             ModelData::MeshData* meshData = meshManager->getDataByIndex(mDataIdx);
@@ -64,8 +67,20 @@ namespace GUI
                 ModelData::MeshKernel* kernel = meshData->getDataByIndex(i);
                 if (!kernel) continue;
 
+                // QString meshName = kernel->getDataObjectName();
+                // if (meshName.isEmpty()) meshName = tr("Mesh %1").arg(i + 1);
+
+                int meshId = kernel->getDataObjectID();  //
+                if (processedMeshIds.contains(meshId)) {
+                continue;
+                }
+                processedMeshIds.insert(meshId);
+
+                globalMeshIndex++;
                 QString meshName = kernel->getDataObjectName();
-                if (meshName.isEmpty()) meshName = tr("Mesh %1").arg(i + 1);
+                if (meshName.isEmpty()) {
+                meshName = tr("Mesh %1").arg(globalMeshIndex);
+                }   //
 
                 QTreeWidgetItem* meshItem = this->CreateTreeItem(meshRoot, "",
                     (int)GUI::ModelTreeItemsType::MTMaterialRoot, "", -1);

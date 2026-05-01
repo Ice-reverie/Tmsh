@@ -9,6 +9,8 @@ HEADERS += \
     $$PWD/OperatorsGeoRemove.h \
     #$$PWD/OperatorExportAbaqusINPFile.h \
     $$PWD/OperatorExportCGNSFile.h \
+    $$PWD/OperatorExportGmshFile.h \
+
 
 SOURCES += \
     $$PWD/OperatorModelInterface.cpp \
@@ -20,6 +22,8 @@ SOURCES += \
     $$PWD/OperatorsGeoRemove.cpp \
     #$$PWD/OperatorExportAbaqusINPFile.cpp \
     $$PWD/OperatorExportCGNSFile.cpp \
+    $$PWD/OperatorExportGmshFile.cpp \
+
     
 FORMS += \
  

@@ -25,6 +25,16 @@
 
 namespace ModelOper
 {
+    bool OperTmshGenerator::_isMeshFinishedExecuting = false;
+
+    OperTmshGenerator::~OperTmshGenerator()
+    {
+        if (_mesher)
+        {
+            disconnect(_mesher, &Interface::FITKAbstractMesherDriver::mesherFinished, this, &OperTmshGenerator::meshGenFinished);
+        }
+    }
+
     namespace
     {
         void refreshMeshTree()
@@ -68,7 +78,7 @@ namespace ModelOper
 
 	void OperTmshGenerator::meshGenOper()
 	{
-		//获取工作目录
+        //获取工作目录
 		QString meshPath = FITKAPP->getTempDir(false, "");
 		QString meshFile = QString("%1/%2").arg(meshPath).arg("geometryFile");
         //QString meshName = "";
@@ -85,8 +95,10 @@ namespace ModelOper
 		if (!mesher) return;
 		_mesher = mesher;
 		//关联信号
-		disconnect(mesher, SIGNAL(mesherFinished()), nullptr, nullptr);
-		connect(mesher, SIGNAL(mesherFinished()), this, SLOT(meshGenFinished()));
+        //disconnect(mesher, SIGNAL(mesherFinished()), nullptr, nullptr);
+        //connect(mesher, SIGNAL(mesherFinished()), this, SLOT(meshGenFinished()));
+        disconnect(mesher, &Interface::FITKAbstractMesherDriver::mesherFinished, this, &OperTmshGenerator::meshGenFinished);
+        connect(mesher, &Interface::FITKAbstractMesherDriver::mesherFinished, this, &OperTmshGenerator::meshGenFinished, Qt::UniqueConnection); // 关键：Qt::UniqueConnection
 		//设置参数
 		mesher->setValue("MeshFile", meshFile);
 		mesher->setValue("MeshFileProcessor", meshFileProcessor);
@@ -98,7 +110,7 @@ namespace ModelOper
 
     void OperTmshGenerator::tetGenOper()
     {
-		//获取工作目录
+        //获取工作目录
 		QString meshPath = FITKAPP->getTempDir(false, "");
 		QString meshFile = QString("%1/%2").arg(meshPath).arg("geometryFile");
 		//QString meshName = "";
@@ -115,8 +127,10 @@ namespace ModelOper
         if (!mesher) return;
         _mesher = mesher;
         //关联信号
-        disconnect(mesher, SIGNAL(mesherFinished()), nullptr, nullptr);
-        connect(mesher, SIGNAL(mesherFinished()), this, SLOT(meshGenFinished()));
+        //disconnect(mesher, SIGNAL(mesherFinished()), nullptr, nullptr);
+        //connect(mesher, SIGNAL(mesherFinished()), this, SLOT(meshGenFinished()));
+        disconnect(mesher, &Interface::FITKAbstractMesherDriver::mesherFinished, this, &OperTmshGenerator::meshGenFinished);
+        connect(mesher, &Interface::FITKAbstractMesherDriver::mesherFinished, this, &OperTmshGenerator::meshGenFinished, Qt::UniqueConnection);
         //设置参数
         mesher->setValue("MeshFile", meshFile);
         mesher->setValue("MeshFileProcessor", meshFileProcessor);
@@ -129,14 +143,20 @@ namespace ModelOper
 
     void OperTmshGenerator::meshGenFinished()
     {
+        AppFrame::FITKMessageNormal(QString("meshGenFinished 执行: %1").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss:zzz")));
+
+        // 兜底：防止重复执行
+        if (_isMeshFinishedExecuting || !_mesher) return;
+        _isMeshFinishedExecuting = true;
+
         if (!_mesher) return;
 
         const QString meshFile = _mesher->getValueT<QString>("MeshFileProcessor");
 
-
         if (meshFile.isEmpty() || !QFileInfo(meshFile).isFile())
         {
             QMessageBox::warning(FITKAPP->getGlobalData()->getMainWindow(), tr("warning"), tr("Err! Mesher ProgramExec generate meshes failed."), QMessageBox::StandardButton::Ok);
+            _isMeshFinishedExecuting = false; // 解锁
             return;
         }
 
@@ -171,6 +191,8 @@ namespace ModelOper
         }
 
         refreshMeshTree();
+
+        _isMeshFinishedExecuting = false; // 解锁
     }
 
     void OperTmshGenerator::meshClean()

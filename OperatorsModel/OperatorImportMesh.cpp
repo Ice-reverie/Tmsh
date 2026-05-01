@@ -145,7 +145,7 @@ namespace ModelOper
 		processorMesh->start(QStringList() << "MSH");
 		int objID = meshKernel->getDataObjectID();
 
-		AppFrame::FITKMessageNormal(QString("Read file succeed:%1 %2").arg(fileName).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss:zzz")));
+        AppFrame::FITKMessageNormal(QString("Read file succeed:%1 %2").arg(fileName).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss:zzz")));
 
 		EventOper::GraphEventOperator* operGraph = FITKOPERREPO->getOperatorT<EventOper::GraphEventOperator>("GraphPreprocess");
 		if (operGraph)
