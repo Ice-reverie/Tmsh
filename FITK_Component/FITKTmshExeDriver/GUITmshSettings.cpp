@@ -198,13 +198,9 @@ namespace GUI
             _driver->setValue("virtualTopos", v);
         }
 
-
-
-
         bool isChecked = _ui->checkBox_tetSwitches->isChecked();
         if (isChecked)
         {
-             qDebug() << "selected sucessfully";
              QString optionStr = _driver->getValue("tetgenOptions").toString().trimmed();
              QStringList cmdArgs;
              // cmdArgs << optionStr.split(" ", Qt::SkipEmptyParts)
@@ -214,12 +210,8 @@ namespace GUI
        }
        else
        {
-             qDebug() << "not selected";
              this->accept();
        }
-
-
-
         this->accept();
     }
 

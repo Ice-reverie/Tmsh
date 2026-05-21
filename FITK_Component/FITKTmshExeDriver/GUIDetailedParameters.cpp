@@ -82,7 +82,7 @@ namespace GUI
         Interface::FITKGlobalMeshGenerateAlgorithmInfo* meshGenerateAlgorithmInfo = Interface::FITKMeshGenInterface::getInstance()->getGlobalMeshGenerateAlgorithmInfo(kMesherKey);
         if (!meshSizeInfo || !meshGenerateAlgorithmInfo) return;
 
-        // Tmsh 专用算法信息（由 FITKMeshAlgorithmGeneratorTmshExec 创建）
+        // Tmsh 专用算法信息（由 FITKMeshAlgorithmGeneratorTmshExec 创建�?
         Tmsh::FITKTmshGlobalMeshGenerateAlgorithmInfo* tmshAlg =
             dynamic_cast<Tmsh::FITKTmshGlobalMeshGenerateAlgorithmInfo*>(meshGenerateAlgorithmInfo);
         if (tmshAlg)
@@ -104,7 +104,7 @@ namespace GUI
         Interface::FITKGlobalMeshGenerateAlgorithmInfo* meshGenerateAlgorithmInfo = Interface::FITKMeshGenInterface::getInstance()->getGlobalMeshGenerateAlgorithmInfo(kMesherKey);
         if (meshGenerateAlgorithmInfo == nullptr) return;
 
-        // 将界面参数写回 Tmsh 算法信息
+        // 将界面参数写�? Tmsh 算法信息
         Tmsh::FITKTmshGlobalMeshGenerateAlgorithmInfo* tmshAlg =
             dynamic_cast<Tmsh::FITKTmshGlobalMeshGenerateAlgorithmInfo*>(meshGenerateAlgorithmInfo);
         if (tmshAlg)

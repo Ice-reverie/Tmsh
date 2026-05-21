@@ -26,6 +26,9 @@
 #include <QDir>
 #include <QProcess>
 #include <QString>
+#include <algorithm>
+#include <QTimer>
+#include <QDateTime>
 
 namespace GUI
 {
@@ -43,19 +46,23 @@ namespace GUI
         flags &= ~Qt::WindowContextHelpButtonHint;
         setWindowFlags(flags);
         
-        /*
-        QString appRunDir = QDir::currentPath();
-        QString tempPath = QDir(appRunDir).filePath("../Tmsh");
-        QString defaultPath = QDir::cleanPath(tempPath);
-        _ui->lineEdit_FilePath->setText(defaultPath);
-        */
+        _timeoutTimer = new QTimer(this);
+        _progressTimer = new QTimer(this);
+        _timeoutSeconds = 300;
+        _noOutputTimeoutSeconds = 60;
+        _lastOutputTime = QDateTime::currentSecsSinceEpoch();
 
         connect(_process, &QProcess::readyReadStandardOutput, this, &GUITetGenSettings::onReadyReadOutput);
         connect(_process, &QProcess::readyReadStandardError, this, &GUITetGenSettings::onReadyReadError);
 
-                connect(_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
+        connect(_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
                 this, [=](int exitCode, QProcess::ExitStatus exitStatus)
         {
+            qDebug() << "TetGen finished with exitCode:" << exitCode << "exitStatus:" << exitStatus;
+            
+            if (_timeoutTimer) _timeoutTimer->stop();
+            if (_progressTimer) _progressTimer->stop();
+            
             if (!_stdOutBuffer.isEmpty())
             {
                 AppFrame::FITKMessageNormal(_stdOutBuffer.trimmed());
@@ -67,16 +74,18 @@ namespace GUI
                 _stdErrBuffer.clear();
             }
 
+            _ui->pushButton_OK->setEnabled(true);
+            
             if(exitCode == 0 && exitStatus == QProcess::NormalExit)
             {
-                QMessageBox::information(this, tr("Success"), tr("Mesh file processing is complete!"), QMessageBox::Ok);
+                QMessageBox::information(nullptr, tr("Success"), tr("Mesh file processing is complete!"), QMessageBox::Ok);
                 this->accept();
             }
             else
             {
-                QMessageBox::critical(this, tr("Faliure"), tr("Failure in processing: %1").arg(_stdErrBuffer), QMessageBox::Ok);
+                QString errMsg = _stdErrBuffer.isEmpty() ? tr("Process exited with code %1").arg(exitCode) : _stdErrBuffer;
+                QMessageBox::critical(nullptr, tr("Failure"), tr("Failure in processing: %1").arg(errMsg), QMessageBox::Ok);
             }
-            _ui->pushButton_OK->setEnabled(true);
         });
         
         this->init();
@@ -92,12 +101,23 @@ namespace GUI
         flags &= ~Qt::WindowContextHelpButtonHint;
         setWindowFlags(flags);
 
+        _timeoutTimer = new QTimer(this);
+        _progressTimer = new QTimer(this);
+        _timeoutSeconds = 300;
+        _noOutputTimeoutSeconds = 60;
+        _lastOutputTime = QDateTime::currentSecsSinceEpoch();
+
         connect(_process, &QProcess::readyReadStandardOutput, this, &GUITetGenSettings::onReadyReadOutput);
         connect(_process, &QProcess::readyReadStandardError, this, &GUITetGenSettings::onReadyReadError);
         
         connect(_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
                 this, [=](int exitCode, QProcess::ExitStatus exitStatus)
         {
+            qDebug() << "TetGen finished with exitCode:" << exitCode << "exitStatus:" << exitStatus;
+            
+            if (_timeoutTimer) _timeoutTimer->stop();
+            if (_progressTimer) _progressTimer->stop();
+            
             if (!_stdOutBuffer.isEmpty())
             {
                 AppFrame::FITKMessageNormal(_stdOutBuffer.trimmed());
@@ -109,23 +129,30 @@ namespace GUI
                 _stdErrBuffer.clear();
             }
 
+            _ui->pushButton_OK->setEnabled(true);
+            
             if(exitCode == 0 && exitStatus == QProcess::NormalExit)
             {
-                QMessageBox::information(this, tr("Success"), tr("Mesh file processing is complete!"), QMessageBox::Ok);
+                QMessageBox::information(nullptr, tr("Success"), tr("Mesh file processing is complete!"), QMessageBox::Ok);
                 this->accept();
             }
             else
             {
-                QMessageBox::critical(this, tr("Faliure"), tr("Failure in processing: %1").arg(_stdErrBuffer), QMessageBox::Ok);
+                QString errMsg = _stdErrBuffer.isEmpty() ? tr("Process exited with code %1").arg(exitCode) : _stdErrBuffer;
+                QMessageBox::critical(nullptr, tr("Failure"), tr("Failure in processing: %1").arg(errMsg), QMessageBox::Ok);
             }
-            _ui->pushButton_OK->setEnabled(true);
-            });
+        });
 
         this->init();
     }
 
     GUITetGenSettings::~GUITetGenSettings()
     {
+        if (_process && _process->state() != QProcess::NotRunning)
+        {
+            _process->kill();
+            _process->waitForFinished(3000);
+        }
         if (_ui)
         {
             delete _ui;
@@ -150,7 +177,6 @@ namespace GUI
         Interface::FITKGlobalMeshGenerateAlgorithmInfo* meshGenerateAlgorithmInfo = Interface::FITKMeshGenInterface::getInstance()->getGlobalMeshGenerateAlgorithmInfo(kMesherKey);
         if (!meshSizeInfo || !meshGenerateAlgorithmInfo) return;
 
-        // Tmsh 专用算法信息（由 FITKMeshAlgorithmGeneratorTmshExec 创建）
         Tmsh::FITKTmshGlobalMeshGenerateAlgorithmInfo* tmshAlg =
             dynamic_cast<Tmsh::FITKTmshGlobalMeshGenerateAlgorithmInfo*>(meshGenerateAlgorithmInfo);
         if (tmshAlg)
@@ -177,7 +203,6 @@ namespace GUI
         QString meshFilePath = _ui->lineEdit_FilePath->text().trimmed();
         QFileInfo meshFileInfo(meshFilePath);
 
-        //提取带后缀的文件名存储到全局接口
         if(meshFileInfo.exists() && meshFileInfo.isFile())
         {
             QString fileName = meshFileInfo.fileName();
@@ -195,38 +220,23 @@ namespace GUI
             return;
         }
 
+        QString fileSuffix = meshFileInfo.suffix().toLower();
+        QStringList supportedFormats = {"poly", "smesh", "node", "stl", "ply", "off", "mesh"};
+        if (!supportedFormats.contains(fileSuffix))
+        {
+            QMessageBox::warning(this, tr("Warning"), 
+                tr("Unsupported file format: .%1\nSupported formats: .poly, .smesh, .node, .stl, .ply, .off, .mesh").arg(fileSuffix));
+            return;
+        }
+
         _driver->setValue("tetgenOptions", userInputOption);
 
         _ui->pushButton_OK->setEnabled(false);
 
-        if (_process == nullptr)
+        if (_process->state() != QProcess::NotRunning)
         {
-           _process = new QProcess(this);
-           // 重新连接信号（如果_process是新建的）
-           connect(_process, &QProcess::readyReadStandardOutput, this, &GUITetGenSettings::onReadyReadOutput);
-           connect(_process, &QProcess::readyReadStandardError, this, &GUITetGenSettings::onReadyReadError);
-           connect(_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
-                   this, [=](int exitCode, QProcess::ExitStatus exitStatus)
-           {
-               if(exitCode == 0 && exitStatus == QProcess::NormalExit)
-               {
-                   QMessageBox::information(this, tr("Success"), tr("Mesh file processing is complete!"), QMessageBox::Ok);
-                   this->accept();
-               }
-               else
-               {
-                   QMessageBox::critical(this, tr("Failure"), tr("Failure in processing: %1").arg(_stdErrBuffer), QMessageBox::Ok);
-                   _ui->pushButton_OK->setEnabled(true);
-               }    });
-            }
-        else
-        {
-            if (_process->state() != QProcess::NotRunning)
-            {
-                _process->kill();
-                _process->waitForFinished(1000);
-             }
-             _process->close();
+            _process->kill();
+            _process->waitForFinished(3000);
         }
 
         QString exePath = "D:/tetgen/tetgen.exe";
@@ -246,7 +256,76 @@ namespace GUI
          cmdArgs << optionStr.split(" ", Qt::SkipEmptyParts)
                  << meshFilePath;
 
+         qDebug() << "Starting TetGen:" << exePath;
+         qDebug() << "Arguments:" << cmdArgs;
+         qDebug() << "Working directory:" << QFileInfo(meshFilePath).absolutePath();
+         qDebug() << "Input file exists:" << QFileInfo(meshFilePath).exists();
+         qDebug() << "Input file size:" << QFileInfo(meshFilePath).size();
+         
+         // Set working directory to input file's directory
+         _process->setWorkingDirectory(QFileInfo(meshFilePath).absolutePath());
+         
+         // Try using startDetached for debugging
          _process->start(exePath, cmdArgs);
+         
+         if (!_process->waitForStarted(5000))
+         {
+             QString errMsg = tr("Failed to start TetGen: %1").arg(_process->errorString());
+             qCritical() << errMsg;
+             QMessageBox::critical(this, tr("Error"), errMsg, QMessageBox::Ok);
+             _ui->pushButton_OK->setEnabled(true);
+             return;
+         }
+         
+         qDebug() << "TetGen started successfully, waiting for completion...";
+         
+         _lastOutputTime = QDateTime::currentSecsSinceEpoch();
+         
+         connect(_timeoutTimer, &QTimer::timeout, this, &GUITetGenSettings::onProcessTimeout);
+         _timeoutTimer->start(_timeoutSeconds * 1000);
+         
+         connect(_progressTimer, &QTimer::timeout, this, [=]() {
+             qint64 currentTime = QDateTime::currentSecsSinceEpoch();
+             qint64 elapsed = currentTime - _lastOutputTime;
+             
+             qDebug() << "Process state:" << _process->state() 
+                      << "pid:" << _process->processId()
+                      << "bytesAvailable:" << _process->bytesAvailable()
+                      << "No output for:" << elapsed << "seconds";
+             
+             if (_process->state() == QProcess::NotRunning)
+             {
+                 qDebug() << "Process is NotRunning but finished signal not received!";
+                 _timeoutTimer->stop();
+                 _progressTimer->stop();
+             }
+             
+             if (elapsed >= _noOutputTimeoutSeconds)
+             {
+                 QString timeoutMsg = tr("TetGen process has no output for %1 seconds, possible hang detected!").arg(elapsed);
+                 qCritical() << timeoutMsg;
+                 AppFrame::FITKMessageError(timeoutMsg);
+                 QMessageBox::critical(nullptr, tr("Process Timeout"), 
+                     tr("TetGen process appears to be stuck (no output for %1 seconds).\n\n"
+                        "This may indicate:\n"
+                        "- Geometry issues causing infinite loops\n"
+                        "- Insufficient memory\n"
+                        "- Invalid input parameters\n\n"
+                        "The process will be terminated.").arg(elapsed), 
+                     QMessageBox::Ok);
+                 
+                 if (_process->state() != QProcess::NotRunning)
+                 {
+                     _process->kill();
+                     _process->waitForFinished(3000);
+                 }
+                 
+                 _timeoutTimer->stop();
+                 _progressTimer->stop();
+                 _ui->pushButton_OK->setEnabled(true);
+             }
+         });
+         _progressTimer->start(5000);
 
         //this->accept();
     }
@@ -286,7 +365,16 @@ namespace GUI
             defaultOpenDir = currentDir.filePath("../" + targetFolderName);
         }
 
-        QString filePath = QFileDialog::getOpenFileName(nullptr, "Import Model File", defaultOpenDir, "Geometry File(*.mesh)");
+        QString filePath = QFileDialog::getOpenFileName(nullptr, "Import Model File", defaultOpenDir,
+            "All Supported Files (*.poly *.smesh *.node *.stl *.ply *.off *.mesh);;"
+            "POLY Files (*.poly);;"
+            "SMESH Files (*.smesh);;"
+            "NODE Files (*.node);;"
+            "STL Files (*.stl);;"
+            "PLY Files (*.ply);;"
+            "OFF Files (*.off);;"
+            "MESH Files (*.mesh);;"
+            "All Files (*.*)");
         if(!filePath.isEmpty())
         {
             _ui->lineEdit_FilePath->setText(filePath);
@@ -295,15 +383,19 @@ namespace GUI
 
     void GUITetGenSettings::onReadyReadOutput()
     {
-        _stdOutBuffer += QString::fromLocal8Bit(_process->readAllStandardOutput());
-        const QChar cr = '\r';
-        const QChar lf = '\n';
-        int lineEndPos = -1;
-
-        while ((lineEndPos = _stdOutBuffer.indexOf(cr)) != -1 || (lineEndPos = _stdOutBuffer.indexOf(lf)) != -1)
+        QByteArray data = _process->readAllStandardOutput();
+        if (data.isEmpty()) return;
+        _lastOutputTime = QDateTime::currentSecsSinceEpoch();
+        _stdOutBuffer += QString::fromUtf8(data);
+        
+        int pos = 0;
+        while ((pos = _stdOutBuffer.indexOf('\n')) != -1)
         {
-            QString line = _stdOutBuffer.left(lineEndPos).trimmed(); // trimmed()去除首尾空格/空行
-            _stdOutBuffer.remove(0, lineEndPos + 1);
+            QString line = _stdOutBuffer.left(pos);
+            if (line.endsWith('\r'))
+                line.chop(1);
+            _stdOutBuffer.remove(0, pos + 1);
+            line = line.trimmed();
             if (!line.isEmpty())
             {
                 AppFrame::FITKMessageNormal(line);
@@ -313,21 +405,51 @@ namespace GUI
 
     void GUITetGenSettings::onReadyReadError()
     {
-        _stdErrBuffer += QString::fromLocal8Bit(_process->readAllStandardError());
-        const QChar cr = '\r';
-        const QChar lf = '\n';
-        int lineEndPos = -1;
-
-        while ((lineEndPos = _stdErrBuffer.indexOf(cr)) != -1 || (lineEndPos = _stdErrBuffer.indexOf(lf)) != -1)
+        QByteArray data = _process->readAllStandardError();
+        if (data.isEmpty()) return;
+        
+        _lastOutputTime = QDateTime::currentSecsSinceEpoch();
+        qDebug() << "TetGen stderr:" << data;
+        _stdErrBuffer += QString::fromUtf8(data);
+        
+        int pos = 0;
+        while ((pos = _stdErrBuffer.indexOf('\n')) != -1)
         {
-            QString line = _stdErrBuffer.left(lineEndPos).trimmed();
-            _stdErrBuffer.remove(0, lineEndPos + 1);
-
+            QString line = _stdErrBuffer.left(pos);
+            if (line.endsWith('\r'))
+                line.chop(1);
+            _stdErrBuffer.remove(0, pos + 1);
+            line = line.trimmed();
             if (!line.isEmpty())
             {
                 AppFrame::FITKMessageWarning(line);
             }
         }
     }
-}
 
+    void GUITetGenSettings::onProcessTimeout()
+    {
+        QString timeoutMsg = tr("TetGen process exceeded maximum execution time of %1 seconds!").arg(_timeoutSeconds);
+        qCritical() << timeoutMsg;
+        AppFrame::FITKMessageError(timeoutMsg);
+        
+        QMessageBox::critical(nullptr, tr("Process Timeout"), 
+            tr("TetGen process has been running for more than %1 seconds.\n\n"
+               "This may indicate:\n"
+               "- Complex geometry causing long processing time\n"
+               "- Process is stuck in an infinite loop\n"
+               "- Insufficient system resources\n\n"
+               "The process will be terminated.").arg(_timeoutSeconds), 
+            QMessageBox::Ok);
+        
+        if (_process && _process->state() != QProcess::NotRunning)
+        {
+            _process->kill();
+            _process->waitForFinished(3000);
+        }
+        
+        if (_timeoutTimer) _timeoutTimer->stop();
+        if (_progressTimer) _progressTimer->stop();
+        _ui->pushButton_OK->setEnabled(true);
+    }
+}

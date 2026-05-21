@@ -46,6 +46,7 @@ namespace GUI
 
         void onReadyReadOutput();
         void onReadyReadError();
+        void onProcessTimeout();
 
     private:
         Ui::GUITetGenSettings* _ui{};
@@ -54,6 +55,11 @@ namespace GUI
         GUITetGenSettings* _detailedDlg{};
 
         QProcess *_process;
+        QTimer* _timeoutTimer;
+        QTimer* _progressTimer;
+        qint64 _lastOutputTime;
+        int _timeoutSeconds;
+        int _noOutputTimeoutSeconds;
     };
 }
 
