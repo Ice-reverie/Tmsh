@@ -118,14 +118,45 @@ void FITKMesherDriverTmshExec::exportGeometryAndSetPaths()
 {
     QVariant v = this->getValue("virtualTopos");
     QList<Interface::VirtualShape> topos = v.value<QList<Interface::VirtualShape>>();
-    if (topos.isEmpty()) return;
-
+    
     const QString meshPath = tmshOutputDir();
     QDir meshDir(meshPath);
     if (!meshDir.exists()) meshDir.mkpath(meshPath);
 
-    const QString shapeFile = meshDir.filePath("geometryFile.brep");
-    QFile::remove(shapeFile);
+    QString inputMeshFile = this->getValueT<QString>("InputMeshFile");
+    QString shapeFile;
+    
+    if (!inputMeshFile.isEmpty() && QFileInfo(inputMeshFile).exists())
+    {
+        shapeFile = inputMeshFile;
+    }
+    else
+    {
+        if (topos.isEmpty()) return;
+        
+        shapeFile = meshDir.filePath("geometryFile.brep");
+        QFile::remove(shapeFile);
+        
+        Interface::FITKMeshGenInterface* mf = Interface::FITKMeshGenInterface::getInstance();
+        if (!mf) return;
+        Interface::FITKGlobalMeshGenerateAlgorithmInfo* algInfo =
+            mf->getGlobalMeshGenerateAlgorithmInfo(kMesherKey);
+        if (!algInfo) return;
+
+        Interface::FITKInterfaceGeometryFactory* geoFactory =
+            Interface::FITKInterfaceGeometryFactory::getInstance();
+        if (!geoFactory) return;
+        Interface::FITKAbsGeoModelExportTopos* geoExport =
+            dynamic_cast<Interface::FITKAbsGeoModelExportTopos*>(
+                geoFactory->createCommand(Interface::FITKGeoEnum::FITKGeometryComType::FGTExportTopos));
+        if (!geoExport) return;
+
+        if (algInfo->getMeshGenerateDimension() == 2)
+            geoExport->setEnableStitch(algInfo->getGeometryStitch());
+        geoExport->setExportTopos(topos);
+        geoExport->setFileName(shapeFile);
+        if (!geoExport->update()) return;
+    }
 
     if (this->getValue("MeshFile").isNull() ||
         this->getValueT<QString>("MeshFile").isEmpty()) {
@@ -136,26 +167,6 @@ void FITKMesherDriverTmshExec::exportGeometryAndSetPaths()
         QFileInfo(meshFile).absolutePath() == meshDir.absolutePath()) {
         QFile::remove(meshFile);
     }
-
-    Interface::FITKMeshGenInterface* mf = Interface::FITKMeshGenInterface::getInstance();
-    if (!mf) return;
-    Interface::FITKGlobalMeshGenerateAlgorithmInfo* algInfo =
-        mf->getGlobalMeshGenerateAlgorithmInfo(kMesherKey);
-    if (!algInfo) return;
-
-    Interface::FITKInterfaceGeometryFactory* geoFactory =
-        Interface::FITKInterfaceGeometryFactory::getInstance();
-    if (!geoFactory) return;
-    Interface::FITKAbsGeoModelExportTopos* geoExport =
-        dynamic_cast<Interface::FITKAbsGeoModelExportTopos*>(
-            geoFactory->createCommand(Interface::FITKGeoEnum::FITKGeometryComType::FGTExportTopos));
-    if (!geoExport) return;
-
-    if (algInfo->getMeshGenerateDimension() == 2)
-        geoExport->setEnableStitch(algInfo->getGeometryStitch());
-    geoExport->setExportTopos(topos);
-    geoExport->setFileName(shapeFile);
-    if (!geoExport->update()) return;
 
     this->setValue("ShapeFile", shapeFile);
 }
@@ -218,6 +229,7 @@ QStringList FITKMesherDriverTmshExec::buildSingleStageArgs() const
         args << "--min_angle" << QString::number(tmshAlg->getMinAngle(), 'g', 16);
     if (tmshAlg->hasUseMultiThreading())
         args << "--use_multi_threading" << QString::number(tmshAlg->getUseMultiThreading(), 'g', 16);
+    /*
     if (tmshAlg->hasRefineIter())
         args << "--refine_iter" << QString::number(tmshAlg->getRefineIter(), 'g', 16);
     if (tmshAlg->hasRefineSmoothIter())
@@ -226,7 +238,7 @@ QStringList FITKMesherDriverTmshExec::buildSingleStageArgs() const
         args << "--adapt_iter" << QString::number(tmshAlg->getAdaptIter(), 'g', 16);
     if (tmshAlg->hasAdaptSmoothIter())
         args << "--adapt_smooth_iter" << QString::number(tmshAlg->getAdaptSmoothIter(), 'g', 16);
-
+    */
     return args;
     //TODO 传参内容分离
 }

@@ -22,6 +22,7 @@
 #include <QDateTime>
 #include <QFileInfo>
 #include <QMessageBox>
+#include <QThread>
 
 namespace ModelOper
 {
@@ -78,64 +79,48 @@ namespace ModelOper
 
 	void OperTmshGenerator::meshGenOper()
 	{
-        //获取工作目录
-		QString meshPath = FITKAPP->getTempDir(false, "");
+        QString meshPath = FITKAPP->getTempDir(false, "");
 		QString meshFile = QString("%1/%2").arg(meshPath).arg("geometryFile");
-        //QString meshName = "";
         QString meshName = Interface::FITKMeshGenInterface::getMeshFileName();
 		if (meshName == "")
 		{
             meshName = "geometryFile.surf.mesh";
 		}
 		QString meshFileProcessor = QString("%1/%2").arg(meshPath).arg(meshName);
-		//获取网格划分接口
 		Interface::FITKMeshGenInterface* mf = Interface::FITKMeshGenInterface::getInstance();
 		if (!mf) return;
 		Interface::FITKAbstractMesherDriver* mesher = mf->getMesherDriver("TmshExec");
 		if (!mesher) return;
 		_mesher = mesher;
-		//关联信号
-        //disconnect(mesher, SIGNAL(mesherFinished()), nullptr, nullptr);
-        //connect(mesher, SIGNAL(mesherFinished()), this, SLOT(meshGenFinished()));
         disconnect(mesher, &Interface::FITKAbstractMesherDriver::mesherFinished, this, &OperTmshGenerator::meshGenFinished);
-        connect(mesher, &Interface::FITKAbstractMesherDriver::mesherFinished, this, &OperTmshGenerator::meshGenFinished, Qt::UniqueConnection); // 关键：Qt::UniqueConnection
-		//设置参数
+        connect(mesher, &Interface::FITKAbstractMesherDriver::mesherFinished, this, &OperTmshGenerator::meshGenFinished, Qt::UniqueConnection);
 		mesher->setValue("MeshFile", meshFile);
 		mesher->setValue("MeshFileProcessor", meshFileProcessor);
 		mesher->setValue("Method", 1);
-		//开始划分网格
 		mesher->startMesher();
 		this->setArgs("MeshFile", meshFile);
 	}
 
     void OperTmshGenerator::tetGenOper()
     {
-        //获取工作目录
-		QString meshPath = FITKAPP->getTempDir(false, "");
+        QString meshPath = FITKAPP->getTempDir(false, "");
 		QString meshFile = QString("%1/%2").arg(meshPath).arg("geometryFile");
-		//QString meshName = "";
 		QString meshName = Interface::FITKMeshGenInterface::getMeshFileName();
 		if (meshName == "")
 		{
 			meshName = "geometryFile.surf.1.mesh";
 		}
 		QString meshFileProcessor = QString("%1/%2").arg(meshPath).arg(meshName);
-        //获取网格划分接口
         Interface::FITKMeshGenInterface* mf = Interface::FITKMeshGenInterface::getInstance();
         if (!mf) return;
         Interface::FITKAbstractMesherDriver* mesher = mf->getMesherDriver("TmshExec");
         if (!mesher) return;
         _mesher = mesher;
-        //关联信号
-        //disconnect(mesher, SIGNAL(mesherFinished()), nullptr, nullptr);
-        //connect(mesher, SIGNAL(mesherFinished()), this, SLOT(meshGenFinished()));
         disconnect(mesher, &Interface::FITKAbstractMesherDriver::mesherFinished, this, &OperTmshGenerator::meshGenFinished);
         connect(mesher, &Interface::FITKAbstractMesherDriver::mesherFinished, this, &OperTmshGenerator::meshGenFinished, Qt::UniqueConnection);
-        //设置参数
         mesher->setValue("MeshFile", meshFile);
         mesher->setValue("MeshFileProcessor", meshFileProcessor);
         mesher->setValue("Method", 2);
-        //开始划分网格
         mesher->startMesher();
         this->setArgs("MeshFile", meshFile);
     }
@@ -143,32 +128,100 @@ namespace ModelOper
 
     void OperTmshGenerator::meshGenFinished()
     {
-        AppFrame::FITKMessageNormal(QString("meshGenFinished 执行: %1").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss:zzz")));
+        AppFrame::FITKMessageNormal(QString("meshGenFinished started: %1").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss:zzz")));
 
-        // 兜底：防止重复执行
-        if (_isMeshFinishedExecuting || !_mesher) return;
+        if (_isMeshFinishedExecuting || !_mesher)
+        {
+            AppFrame::FITKMessageNormal(QString("meshGenFinished skipped: executing=%1, mesher=%2")
+                .arg(_isMeshFinishedExecuting).arg(_mesher ? "valid" : "null"));
+            return;
+        }
         _isMeshFinishedExecuting = true;
 
-        if (!_mesher) return;
-
         const QString meshFile = _mesher->getValueT<QString>("MeshFileProcessor");
+        
+        AppFrame::FITKMessageNormal(QString("MeshFileProcessor: %1").arg(meshFile));
 
-        if (meshFile.isEmpty() || !QFileInfo(meshFile).isFile())
+        if (meshFile.isEmpty())
         {
-            QMessageBox::warning(FITKAPP->getGlobalData()->getMainWindow(), tr("warning"), tr("Err! Mesher ProgramExec generate meshes failed."), QMessageBox::StandardButton::Ok);
-            _isMeshFinishedExecuting = false; // 解锁
+            AppFrame::FITKMessageError("MeshFileProcessor is empty!");
+            QMessageBox::warning(FITKAPP->getGlobalData()->getMainWindow(), tr("Warning"), 
+                tr("Mesh file path is empty!"), QMessageBox::StandardButton::Ok);
+            _isMeshFinishedExecuting = false;
             return;
         }
 
+        QFileInfo fileInfo(meshFile);
+        int waitCount = 0;
+        while (!fileInfo.exists() && waitCount < 50)
+        {
+            QThread::msleep(100);
+            fileInfo.refresh();
+            waitCount++;
+            AppFrame::FITKMessageNormal(QString("Waiting for mesh file... (%1/50)").arg(waitCount));
+        }
+        
+        if (!fileInfo.exists())
+        {
+            AppFrame::FITKMessageError(QString("Mesh file does not exist after waiting: %1").arg(meshFile));
+            QMessageBox::warning(FITKAPP->getGlobalData()->getMainWindow(), tr("Warning"), 
+                tr("Mesh file not found:\n%1").arg(meshFile), QMessageBox::StandardButton::Ok);
+            _isMeshFinishedExecuting = false;
+            return;
+        }
+
+        if (!fileInfo.isFile())
+        {
+            AppFrame::FITKMessageError(QString("Path is not a file: %1").arg(meshFile));
+            QMessageBox::warning(FITKAPP->getGlobalData()->getMainWindow(), tr("Warning"), 
+                tr("Path is not a file:\n%1").arg(meshFile), QMessageBox::StandardButton::Ok);
+            _isMeshFinishedExecuting = false;
+            return;
+        }
+
+        if (fileInfo.size() == 0)
+        {
+            AppFrame::FITKMessageError(QString("Mesh file is empty: %1").arg(meshFile));
+            QMessageBox::warning(FITKAPP->getGlobalData()->getMainWindow(), tr("Warning"), 
+                tr("Mesh file is empty:\n%1").arg(meshFile), QMessageBox::StandardButton::Ok);
+            _isMeshFinishedExecuting = false;
+            return;
+        }
+
+        AppFrame::FITKMessageNormal(QString("Mesh file verified: %1, size: %2 bytes").arg(meshFile).arg(fileInfo.size()));
+
         ModelData::MeshManager* meshManager = FITKAPP->getGlobalData()->getMeshData<ModelData::MeshManager>();
-        if (!meshManager) return;
+        if (!meshManager)
+        {
+            AppFrame::FITKMessageError("Failed to get MeshManager");
+            _isMeshFinishedExecuting = false;
+            return;
+        }
+        
         ModelData::MeshData* meshData = meshManager->getMeshDataObjectByNameT<ModelData::MeshData>("Tmsh");
-        if (!meshData) return;
+        if (!meshData)
+        {
+            AppFrame::FITKMessageError("Failed to get MeshData 'Tmsh'");
+            _isMeshFinishedExecuting = false;
+            return;
+        }
 
         Interface::FITKMeshGenInterface* mf = Interface::FITKMeshGenInterface::getInstance();
-        if (!mf) return;
+        if (!mf)
+        {
+            AppFrame::FITKMessageError("Failed to get FITKMeshGenInterface");
+            _isMeshFinishedExecuting = false;
+            return;
+        }
+        
         Interface::FITKAbstractMeshProcessor* processorMesh = mf->getMeshProcessor("TmshExec");
-        if (!processorMesh) return;
+        if (!processorMesh)
+        {
+            AppFrame::FITKMessageError("Failed to get MeshProcessor 'TmshExec'");
+            _isMeshFinishedExecuting = false;
+            return;
+        }
+        
         processorMesh->setValue("File", meshFile);
         processorMesh->setValue("FilterDim", QList<QVariant>() << 0 << 1);
 
@@ -182,7 +235,7 @@ namespace ModelOper
         processorMesh->start(QStringList() << "MSH");
         int objID = meshKernel->getDataObjectID();
 
-        AppFrame::FITKMessageNormal(QString("Read file succeed:%1 %2").arg(meshFile).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss:zzz")));
+        AppFrame::FITKMessageNormal(QString("Read file succeed: %1 %2").arg(meshFile).arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss:zzz")));
 
         EventOper::GraphEventOperator* operGraph = FITKOPERREPO->getOperatorT<EventOper::GraphEventOperator>("GraphPreprocess");
         if (operGraph)
@@ -192,7 +245,8 @@ namespace ModelOper
 
         refreshMeshTree();
 
-        _isMeshFinishedExecuting = false; // 解锁
+        _isMeshFinishedExecuting = false;
+        AppFrame::FITKMessageNormal(QString("meshGenFinished completed: %1").arg(QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss:zzz")));
     }
 
     void OperTmshGenerator::meshClean()
