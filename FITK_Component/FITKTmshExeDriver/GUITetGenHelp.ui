@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>400</width>
-    <height>567</height>
+    <height>577</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -19,34 +19,9 @@
      <x>10</x>
      <y>10</y>
      <width>381</width>
-     <height>521</height>
+     <height>531</height>
     </rect>
    </property>
-   <item>
-    <property name="text">
-     <string>    -p  Tetrahedralizes a piecewise linear complex (PLC).</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>    -Y  Preserves the input surface mesh (does not modify it).</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>    -r  Reconstructs a previously generated mesh.</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>    -q  Refines mesh (to improve mesh quality).</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>    -R  Mesh coarsening (to reduce the mesh elements).</string>
-    </property>
-   </item>
    <item>
     <property name="text">
      <string>    -A  Assigns attributes to tetrahedra in different regions.</string>
@@ -59,42 +34,12 @@
    </item>
    <item>
     <property name="text">
-     <string>    -m  Applies a mesh sizing function.</string>
+     <string>    -B  Suppresses output of boundary information.</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>    -i  Inserts a list of additional points.</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>    -O  Specifies the level of mesh optimization.</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>    -S  Specifies maximum number of added points.</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>    -T  Sets a tolerance for coplanar test (default 1e-8).</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>    -X  Suppresses use of exact arithmetic.</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>    -M  No merge of coplanar facets or very close vertices.</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>    -w  Generates weighted Delaunay (regular) triangulation.</string>
+     <string>    -C  Checks the consistency of the final mesh.</string>
     </property>
    </item>
    <item>
@@ -109,12 +54,7 @@
    </item>
    <item>
     <property name="text">
-     <string>    -z  Numbers all output items starting from zero.</string>
-    </property>
-   </item>
-   <item>
-    <property name="text">
-     <string>    -f  Outputs all faces to .face file.</string>
+     <string>    -E  Suppresses output of .ele file.</string>
     </property>
    </item>
    <item>
@@ -124,7 +64,12 @@
    </item>
    <item>
     <property name="text">
-     <string>    -n  Outputs tetrahedra neighbors to .neigh file.</string>
+     <string>    -F  Suppresses output of .face and .edge file.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -f  Outputs all faces to .face file.</string>
     </property>
    </item>
    <item>
@@ -134,7 +79,12 @@
    </item>
    <item>
     <property name="text">
-     <string>    -k  Outputs mesh to .vtk file for viewing by Paraview.</string>
+     <string>    -I  Suppresses mesh iteration numbers.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -i  Inserts a list of additional points.</string>
     </property>
    </item>
    <item>
@@ -144,7 +94,17 @@
    </item>
    <item>
     <property name="text">
-     <string>    -B  Suppresses output of boundary information.</string>
+     <string>    -k  Outputs mesh to .vtk file for viewing by Paraview.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -M  No merge of coplanar facets or very close vertices.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -m  Applies a mesh sizing function.</string>
     </property>
    </item>
    <item>
@@ -154,22 +114,22 @@
    </item>
    <item>
     <property name="text">
-     <string>    -E  Suppresses output of .ele file.</string>
+     <string>    -n  Outputs tetrahedra neighbors to .neigh file.</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>    -F  Suppresses output of .face and .edge file.</string>
+     <string>    -O  Specifies the level of mesh optimization.</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>    -I  Suppresses mesh iteration numbers.</string>
+     <string>    -o2 Outputs quadratic tetrahedral mesh.</string>
     </property>
    </item>
    <item>
     <property name="text">
-     <string>    -C  Checks the consistency of the final mesh.</string>
+     <string>    -p  Tetrahedralizes a piecewise linear complex (PLC).</string>
     </property>
    </item>
    <item>
@@ -179,7 +139,52 @@
    </item>
    <item>
     <property name="text">
+     <string>    -q  Refines mesh (to improve mesh quality).</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -R  Mesh coarsening (to reduce the mesh elements).</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -r  Reconstructs a previously generated mesh.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -S  Specifies maximum number of added points.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -T  Sets a tolerance for coplanar test (default 1e-8).</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
      <string>    -V  Verbose:  Detailed information, more terminal output.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -w  Generates weighted Delaunay (regular) triangulation.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -X  Suppresses use of exact arithmetic.</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -Y  Preserves the input surface mesh (does not modify it).</string>
+    </property>
+   </item>
+   <item>
+    <property name="text">
+     <string>    -z  Numbers all output items starting from zero.</string>
     </property>
    </item>
   </widget>
@@ -187,7 +192,7 @@
    <property name="geometry">
     <rect>
      <x>290</x>
-     <y>540</y>
+     <y>550</y>
      <width>80</width>
      <height>20</height>
     </rect>

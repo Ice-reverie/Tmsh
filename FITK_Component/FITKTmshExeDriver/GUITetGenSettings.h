@@ -14,6 +14,7 @@
 
 #include <QWidget>
 #include <QProcess>
+#include <QPointer>
 
 namespace Ui { class GUITetGenSettings; }
 
@@ -35,6 +36,14 @@ namespace GUI
 
     private:
         void init();
+        QString generateCommand();
+        QString generateBasicOptions();
+        QString generateQualityOptions();
+        QString generateAdaptiveOptions();
+        QString generateOptimizeOptions();
+        QString generateRegionOptions();
+        QString generateOutputOptions();
+        void updatePreview();
         QString _stdOutBuffer;
         QString _stdErrBuffer;
 
@@ -43,10 +52,14 @@ namespace GUI
         void on_pushButton_Cancel_clicked();
         void on_pushButton_Help_clicked();
         void on_pushButton_Browse_clicked();
+        void on_pushButton_Preview_clicked();
 
         void onReadyReadOutput();
         void onReadyReadError();
         void onProcessTimeout();
+        void onOptionChanged();
+        void onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus);
+        void onProgressTimeout();
 
     private:
         Ui::GUITetGenSettings* _ui{};
@@ -60,6 +73,7 @@ namespace GUI
         qint64 _lastOutputTime;
         int _timeoutSeconds;
         int _noOutputTimeoutSeconds;
+        bool _isDestroying;
     };
 }
 

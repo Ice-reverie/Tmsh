@@ -37,7 +37,7 @@ namespace GUI
         constexpr const char* kMesherKey = "TmshExec";
     }
 
-    GUITetGenSettings::GUITetGenSettings(QWidget* parent/* = nullptr*/) : Core::FITKDialog(parent), _process(new QProcess(this))
+    GUITetGenSettings::GUITetGenSettings(QWidget* parent/* = nullptr*/) : Core::FITKDialog(parent), _process(new QProcess(this)), _isDestroying(false)
     {
         _ui = new Ui::GUITetGenSettings();
         _ui->setupUi(this);
@@ -54,45 +54,14 @@ namespace GUI
 
         connect(_process, &QProcess::readyReadStandardOutput, this, &GUITetGenSettings::onReadyReadOutput);
         connect(_process, &QProcess::readyReadStandardError, this, &GUITetGenSettings::onReadyReadError);
-
         connect(_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
-                this, [=](int exitCode, QProcess::ExitStatus exitStatus)
-        {
-            qDebug() << "TetGen finished with exitCode:" << exitCode << "exitStatus:" << exitStatus;
-            
-            if (_timeoutTimer) _timeoutTimer->stop();
-            if (_progressTimer) _progressTimer->stop();
-            
-            if (!_stdOutBuffer.isEmpty())
-            {
-                AppFrame::FITKMessageNormal(_stdOutBuffer.trimmed());
-                _stdOutBuffer.clear();
-            }
-            if (!_stdErrBuffer.isEmpty())
-            {
-                AppFrame::FITKMessageWarning(_stdErrBuffer.trimmed());
-                _stdErrBuffer.clear();
-            }
-
-            _ui->pushButton_OK->setEnabled(true);
-            
-            if(exitCode == 0 && exitStatus == QProcess::NormalExit)
-            {
-                QMessageBox::information(nullptr, tr("Success"), tr("Mesh file processing is complete!"), QMessageBox::Ok);
-                this->accept();
-            }
-            else
-            {
-                QString errMsg = _stdErrBuffer.isEmpty() ? tr("Process exited with code %1").arg(exitCode) : _stdErrBuffer;
-                QMessageBox::critical(nullptr, tr("Failure"), tr("Failure in processing: %1").arg(errMsg), QMessageBox::Ok);
-            }
-        });
+                this, &GUITetGenSettings::onProcessFinished);
         
         this->init();
     }
 
     GUITetGenSettings::GUITetGenSettings(Interface::FITKAbstractMesherDriver* driver, QWidget* parent/* = nullptr*/)
-        : Core::FITKDialog(parent), _driver(driver), _process(new QProcess(this))
+        : Core::FITKDialog(parent), _driver(driver), _process(new QProcess(this)), _isDestroying(false)
     {
         _ui = new Ui::GUITetGenSettings();
         _ui->setupUi(this);
@@ -109,63 +78,55 @@ namespace GUI
 
         connect(_process, &QProcess::readyReadStandardOutput, this, &GUITetGenSettings::onReadyReadOutput);
         connect(_process, &QProcess::readyReadStandardError, this, &GUITetGenSettings::onReadyReadError);
-        
         connect(_process, static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(&QProcess::finished),
-                this, [=](int exitCode, QProcess::ExitStatus exitStatus)
-        {
-            qDebug() << "TetGen finished with exitCode:" << exitCode << "exitStatus:" << exitStatus;
-            
-            if (_timeoutTimer) _timeoutTimer->stop();
-            if (_progressTimer) _progressTimer->stop();
-            
-            if (!_stdOutBuffer.isEmpty())
-            {
-                AppFrame::FITKMessageNormal(_stdOutBuffer.trimmed());
-                _stdOutBuffer.clear();
-            }
-            if (!_stdErrBuffer.isEmpty())
-            {
-                AppFrame::FITKMessageWarning(_stdErrBuffer.trimmed());
-                _stdErrBuffer.clear();
-            }
-
-            _ui->pushButton_OK->setEnabled(true);
-            
-            if(exitCode == 0 && exitStatus == QProcess::NormalExit)
-            {
-                QMessageBox::information(nullptr, tr("Success"), tr("Mesh file processing is complete!"), QMessageBox::Ok);
-                this->accept();
-            }
-            else
-            {
-                QString errMsg = _stdErrBuffer.isEmpty() ? tr("Process exited with code %1").arg(exitCode) : _stdErrBuffer;
-                QMessageBox::critical(nullptr, tr("Failure"), tr("Failure in processing: %1").arg(errMsg), QMessageBox::Ok);
-            }
-        });
+                this, &GUITetGenSettings::onProcessFinished);
 
         this->init();
     }
 
     GUITetGenSettings::~GUITetGenSettings()
     {
-        if (_process && _process->state() != QProcess::NotRunning)
+        _isDestroying = true;
+        
+        if (_timeoutTimer)
         {
-            _process->kill();
-            _process->waitForFinished(3000);
+            _timeoutTimer->stop();
+            disconnect(_timeoutTimer, nullptr, this, nullptr);
         }
+        
+        if (_progressTimer)
+        {
+            _progressTimer->stop();
+            disconnect(_progressTimer, nullptr, this, nullptr);
+        }
+        
+        if (_process)
+        {
+            disconnect(_process, nullptr, this, nullptr);
+            if (_process->state() != QProcess::NotRunning)
+            {
+                _process->kill();
+                _process->waitForFinished(3000);
+            }
+        }
+        
         if (_ui)
         {
             delete _ui;
             _ui = nullptr;
         }
+        
         if (_detailedDlg)
         {
             delete _detailedDlg;
             _detailedDlg = nullptr;
         }
+        
         AppFrame::FITKSignalTransfer* signalTransfer = FITKAPP->getSignalTransfer();
-        if (!signalTransfer) return;
-        emit signalTransfer->setPickableObjTypeSig(-1);
+        if (signalTransfer)
+        {
+            emit signalTransfer->setPickableObjTypeSig(-1);
+        }
     }
 
 
@@ -183,6 +144,33 @@ namespace GUI
         {
             _ui->lineEdit_Option->text().trimmed();
         }
+
+        connect(_ui->checkBox_p, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->checkBox_Y, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->checkBox_r, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->checkBox_q, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->doubleSpinBox_ratio, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->doubleSpinBox_angle, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->checkBox_a, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->doubleSpinBox_volume, QOverload<double>::of(&QDoubleSpinBox::valueChanged), this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->checkBox_m, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->checkBox_O, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->spinBox_level, QOverload<int>::of(&QSpinBox::valueChanged), this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->checkBox_flip, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->checkBox_smooth, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->checkBox_vertex, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->spinBox_iter, QOverload<int>::of(&QSpinBox::valueChanged), this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->checkBox_A, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->checkBox_f, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->checkBox_e, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->checkBox_n, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->checkBox_k, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->checkBox_g, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->checkBox_z, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->checkBox_o2, &QCheckBox::stateChanged, this, &GUITetGenSettings::onOptionChanged);
+        connect(_ui->lineEdit_Option, &QLineEdit::textChanged, this, &GUITetGenSettings::onOptionChanged);
+
+        updatePreview();
     }
 
     void GUITetGenSettings::on_pushButton_OK_clicked()
@@ -209,10 +197,19 @@ namespace GUI
             Interface::FITKMeshGenInterface::setMeshFileName(fileName);
         }
 
-        if(userInputOption.isEmpty())
+        QString optionStr;
+        if (!userInputOption.isEmpty())
         {
-            QMessageBox::warning(this, tr("Warning"), tr("Please enter the parameters!"));
-            return;
+            optionStr = userInputOption;
+        }
+        else
+        {
+            optionStr = generateCommand();
+            if(optionStr.isEmpty())
+            {
+                QMessageBox::warning(this, tr("Warning"), tr("Please configure at least one option!"));
+                return;
+            }
         }
         if(meshFilePath.isEmpty() || !meshFileInfo.exists() || !meshFileInfo.isFile())
         {
@@ -229,7 +226,7 @@ namespace GUI
             return;
         }
 
-        _driver->setValue("tetgenOptions", userInputOption);
+        _driver->setValue("tetgenOptions", optionStr);
 
         _ui->pushButton_OK->setEnabled(false);
 
@@ -251,7 +248,6 @@ namespace GUI
             return;
         }
 
-         QString optionStr = _driver->getValue("tetgenOptions").toString().trimmed();
          QStringList cmdArgs;
          cmdArgs << optionStr.split(" ", Qt::SkipEmptyParts)
                  << meshFilePath;
@@ -284,47 +280,7 @@ namespace GUI
          connect(_timeoutTimer, &QTimer::timeout, this, &GUITetGenSettings::onProcessTimeout);
          _timeoutTimer->start(_timeoutSeconds * 1000);
          
-         connect(_progressTimer, &QTimer::timeout, this, [=]() {
-             qint64 currentTime = QDateTime::currentSecsSinceEpoch();
-             qint64 elapsed = currentTime - _lastOutputTime;
-             
-             qDebug() << "Process state:" << _process->state() 
-                      << "pid:" << _process->processId()
-                      << "bytesAvailable:" << _process->bytesAvailable()
-                      << "No output for:" << elapsed << "seconds";
-             
-             if (_process->state() == QProcess::NotRunning)
-             {
-                 qDebug() << "Process is NotRunning but finished signal not received!";
-                 _timeoutTimer->stop();
-                 _progressTimer->stop();
-             }
-             
-             if (elapsed >= _noOutputTimeoutSeconds)
-             {
-                 QString timeoutMsg = tr("TetGen process has no output for %1 seconds, possible hang detected!").arg(elapsed);
-                 qCritical() << timeoutMsg;
-                 AppFrame::FITKMessageError(timeoutMsg);
-                 QMessageBox::critical(nullptr, tr("Process Timeout"), 
-                     tr("TetGen process appears to be stuck (no output for %1 seconds).\n\n"
-                        "This may indicate:\n"
-                        "- Geometry issues causing infinite loops\n"
-                        "- Insufficient memory\n"
-                        "- Invalid input parameters\n\n"
-                        "The process will be terminated.").arg(elapsed), 
-                     QMessageBox::Ok);
-                 
-                 if (_process->state() != QProcess::NotRunning)
-                 {
-                     _process->kill();
-                     _process->waitForFinished(3000);
-                 }
-                 
-                 _timeoutTimer->stop();
-                 _progressTimer->stop();
-                 _ui->pushButton_OK->setEnabled(true);
-             }
-         });
+         connect(_progressTimer, &QTimer::timeout, this, &GUITetGenSettings::onProgressTimeout);
          _progressTimer->start(5000);
 
         //this->accept();
@@ -383,13 +339,15 @@ namespace GUI
 
     void GUITetGenSettings::onReadyReadOutput()
     {
+        if (_isDestroying || !_process) return;
+        
         QByteArray data = _process->readAllStandardOutput();
         if (data.isEmpty()) return;
         _lastOutputTime = QDateTime::currentSecsSinceEpoch();
         _stdOutBuffer += QString::fromUtf8(data);
         
         int pos = 0;
-        while ((pos = _stdOutBuffer.indexOf('\n')) != -1)
+        while ((pos = _stdOutBuffer.indexOf('\n')) != -1 && pos >= 0)
         {
             QString line = _stdOutBuffer.left(pos);
             if (line.endsWith('\r'))
@@ -405,6 +363,8 @@ namespace GUI
 
     void GUITetGenSettings::onReadyReadError()
     {
+        if (_isDestroying || !_process) return;
+        
         QByteArray data = _process->readAllStandardError();
         if (data.isEmpty()) return;
         
@@ -413,7 +373,7 @@ namespace GUI
         _stdErrBuffer += QString::fromUtf8(data);
         
         int pos = 0;
-        while ((pos = _stdErrBuffer.indexOf('\n')) != -1)
+        while ((pos = _stdErrBuffer.indexOf('\n')) != -1 && pos >= 0)
         {
             QString line = _stdErrBuffer.left(pos);
             if (line.endsWith('\r'))
@@ -429,6 +389,8 @@ namespace GUI
 
     void GUITetGenSettings::onProcessTimeout()
     {
+        if (_isDestroying) return;
+        
         QString timeoutMsg = tr("TetGen process exceeded maximum execution time of %1 seconds!").arg(_timeoutSeconds);
         qCritical() << timeoutMsg;
         AppFrame::FITKMessageError(timeoutMsg);
@@ -450,6 +412,290 @@ namespace GUI
         
         if (_timeoutTimer) _timeoutTimer->stop();
         if (_progressTimer) _progressTimer->stop();
-        _ui->pushButton_OK->setEnabled(true);
+        if (_ui) _ui->pushButton_OK->setEnabled(true);
+    }
+
+    void GUITetGenSettings::onProcessFinished(int exitCode, QProcess::ExitStatus exitStatus)
+    {
+        if (_isDestroying) return;
+        
+        qDebug() << "TetGen finished with exitCode:" << exitCode << "exitStatus:" << exitStatus;
+        
+        if (_timeoutTimer) _timeoutTimer->stop();
+        if (_progressTimer) _progressTimer->stop();
+        
+        if (!_stdOutBuffer.isEmpty())
+        {
+            AppFrame::FITKMessageNormal(_stdOutBuffer.trimmed());
+            _stdOutBuffer.clear();
+        }
+        if (!_stdErrBuffer.isEmpty())
+        {
+            AppFrame::FITKMessageWarning(_stdErrBuffer.trimmed());
+            _stdErrBuffer.clear();
+        }
+
+        if (_ui)
+        {
+            _ui->pushButton_OK->setEnabled(true);
+        }
+        
+        if(exitCode == 0 && exitStatus == QProcess::NormalExit)
+        {
+            QMessageBox::information(nullptr, tr("Success"), tr("Mesh file processing is complete!"), QMessageBox::Ok);
+            this->accept();
+        }
+        else
+        {
+            QString errMsg = _stdErrBuffer.isEmpty() ? tr("Process exited with code %1").arg(exitCode) : _stdErrBuffer;
+            QMessageBox::critical(nullptr, tr("Failure"), tr("Failure in processing: %1").arg(errMsg), QMessageBox::Ok);
+        }
+    }
+
+    void GUITetGenSettings::onProgressTimeout()
+    {
+        if (_isDestroying || !_process || !_ui) return;
+        
+        qint64 currentTime = QDateTime::currentSecsSinceEpoch();
+        qint64 elapsed = currentTime - _lastOutputTime;
+        
+        qDebug() << "Process state:" << _process->state() 
+                 << "pid:" << _process->processId()
+                 << "bytesAvailable:" << _process->bytesAvailable()
+                 << "No output for:" << elapsed << "seconds";
+        
+        if (_process->state() == QProcess::NotRunning)
+        {
+            qDebug() << "Process is NotRunning but finished signal not received!";
+            if (_timeoutTimer) _timeoutTimer->stop();
+            if (_progressTimer) _progressTimer->stop();
+            return;
+        }
+        
+        if (elapsed >= _noOutputTimeoutSeconds)
+        {
+            QString timeoutMsg = tr("TetGen process has no output for %1 seconds, possible hang detected!").arg(elapsed);
+            qCritical() << timeoutMsg;
+            AppFrame::FITKMessageError(timeoutMsg);
+            QMessageBox::critical(nullptr, tr("Process Timeout"), 
+                tr("TetGen process appears to be stuck (no output for %1 seconds).\n\n"
+                   "This may indicate:\n"
+                   "- Geometry issues causing infinite loops\n"
+                   "- Insufficient memory\n"
+                   "- Invalid input parameters\n\n"
+                   "The process will be terminated.").arg(elapsed), 
+                QMessageBox::Ok);
+            
+            if (_process->state() != QProcess::NotRunning)
+            {
+                _process->kill();
+                _process->waitForFinished(3000);
+            }
+            
+            if (_timeoutTimer) _timeoutTimer->stop();
+            if (_progressTimer) _progressTimer->stop();
+            if (_ui) _ui->pushButton_OK->setEnabled(true);
+        }
+    }
+
+    void GUITetGenSettings::onOptionChanged()
+    {
+        if (_isDestroying) return;
+        updatePreview();
+    }
+
+    void GUITetGenSettings::on_pushButton_Preview_clicked()
+    {
+        if (_isDestroying) return;
+        QString cmd = generateCommand();
+        QMessageBox::information(this, tr("Generated Command"), 
+            tr("Generated TetGen command:\n\n%1").arg(cmd), QMessageBox::Ok);
+    }
+
+    void GUITetGenSettings::updatePreview()
+    {
+        if (_isDestroying || !_ui) return;
+        
+        QString manualInput = _ui->lineEdit_Option->text().trimmed();
+        if (!manualInput.isEmpty())
+        {
+            _ui->lineEdit_Preview->setText(manualInput);
+        }
+        else
+        {
+            QString cmd = generateCommand();
+            _ui->lineEdit_Preview->setText(cmd);
+        }
+    }
+
+    QString GUITetGenSettings::generateCommand()
+    {
+        if (_isDestroying || !_ui) return "";
+        
+        QStringList options;
+        
+        options << generateBasicOptions();
+        options << generateQualityOptions();
+        options << generateAdaptiveOptions();
+        options << generateOptimizeOptions();
+        options << generateRegionOptions();
+        options << generateOutputOptions();
+        
+        options.removeAll("");
+        
+        return options.join(" ");
+    }
+
+    QString GUITetGenSettings::generateBasicOptions()
+    {
+        if (_isDestroying || !_ui) return "";
+        
+        QStringList basic;
+        
+        if (_ui->checkBox_p->isChecked())
+        {
+            basic << "-p";
+        }
+        
+        if (_ui->checkBox_Y->isChecked())
+        {
+            basic << "-Y";
+        }
+        
+        if (_ui->checkBox_r->isChecked())
+        {
+            basic << "-r";
+        }
+        
+        return basic.join(" ");
+    }
+
+    QString GUITetGenSettings::generateQualityOptions()
+    {
+        if (_isDestroying || !_ui) return "";
+        
+        if (!_ui->checkBox_q->isChecked())
+        {
+            return "";
+        }
+        
+        double ratio = _ui->doubleSpinBox_ratio->value();
+        double angle = _ui->doubleSpinBox_angle->value();
+        
+        QString qOpt = QString("-q%1").arg(ratio);
+        if (angle > 0.0)
+        {
+            qOpt += QString("/%1").arg(static_cast<int>(angle));
+        }
+        
+        return qOpt;
+    }
+
+    QString GUITetGenSettings::generateAdaptiveOptions()
+    {
+        if (_isDestroying || !_ui) return "";
+        
+        QStringList adaptive;
+        
+        if (_ui->checkBox_a->isChecked())
+        {
+            double volume = _ui->doubleSpinBox_volume->value();
+            adaptive << QString("-a%1").arg(volume);
+        }
+        
+        if (_ui->checkBox_m->isChecked())
+        {
+            adaptive << "-m";
+        }
+        
+        return adaptive.join(" ");
+    }
+
+    QString GUITetGenSettings::generateOptimizeOptions()
+    {
+        if (_isDestroying || !_ui) return "";
+        
+        if (!_ui->checkBox_O->isChecked())
+        {
+            return "";
+        }
+        
+        int level = _ui->spinBox_level->value();
+        int iter = _ui->spinBox_iter->value();
+        
+        bool flip = _ui->checkBox_flip->isChecked();
+        bool smooth = _ui->checkBox_smooth->isChecked();
+        bool vertex = _ui->checkBox_vertex->isChecked();
+        
+        QString OOpt = QString("-O%1").arg(level);
+        
+        QStringList ops;
+        if (flip) ops << "1";
+        if (smooth) ops << "2";
+        if (vertex) ops << "3";
+        
+        if (!ops.isEmpty())
+        {
+            OOpt += "/" + ops.join("");
+        }
+        
+        OOpt += QString("/%1").arg(iter);
+        
+        return OOpt;
+    }
+
+    QString GUITetGenSettings::generateRegionOptions()
+    {
+        if (_isDestroying || !_ui) return "";
+        
+        if (_ui->checkBox_A->isChecked())
+        {
+            return "-A";
+        }
+        return "";
+    }
+
+    QString GUITetGenSettings::generateOutputOptions()
+    {
+        if (_isDestroying || !_ui) return "";
+        
+        QStringList output;
+        
+        if (_ui->checkBox_f->isChecked())
+        {
+            output << "-f";
+        }
+        
+        if (_ui->checkBox_e->isChecked())
+        {
+            output << "-e";
+        }
+        
+        if (_ui->checkBox_n->isChecked())
+        {
+            output << "-n";
+        }
+        
+        if (_ui->checkBox_k->isChecked())
+        {
+            output << "-k";
+        }
+        
+        if (_ui->checkBox_g->isChecked())
+        {
+            output << "-g";
+        }
+        
+        if (_ui->checkBox_z->isChecked())
+        {
+            output << "-z";
+        }
+        
+        if (_ui->checkBox_o2->isChecked())
+        {
+            output << "-o2";
+        }
+        
+        return output.join(" ");
     }
 }
