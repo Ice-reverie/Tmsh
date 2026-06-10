@@ -122,7 +122,337 @@ namespace Interface
         q._maxEdgeLength = edgeLength.last();
         //计算长宽比
         q._aspectRatio = q._maxEdgeLength / q._minEdgeLength;
+        
+        //计算扩展质量指标
+        q._jacobian = calculateJacobian(eleIndex);
+        q._skewness = calculateSkewness(eleIndex);
+        q._warpage = calculateWarpage(eleIndex);
+        q._scaledJacobian = calculateScaledJacobian(eleIndex);
+        q._shape = calculateShape(eleIndex);
+        q._condition = calculateCondition(eleIndex);
+        
         return q;
+    }
+    
+    double FITKUnstructuredMesh::calculateJacobian(const int eleIndex)
+    {
+        FITKAbstractElement* ele = this->getElementAt(eleIndex);
+        if (ele == nullptr) return 0.0;
+        
+        QList<int> nodes = ele->getAllNodes();
+        if (nodes.size() < 3) return 0.0;
+        
+        Core::FITKNode* n0 = this->getNodeByID(nodes[0]);
+        Core::FITKNode* n1 = this->getNodeByID(nodes[1]);
+        Core::FITKNode* n2 = this->getNodeByID(nodes[2]);
+        
+        if (!n0 || !n1 || !n2) return 0.0;
+        
+        double v1[3], v2[3];
+        for (int i = 0; i < 3; ++i) {
+            v1[i] = (*n1)[i] - (*n0)[i];
+            v2[i] = (*n2)[i] - (*n0)[i];
+        }
+        
+        double jacobian = v1[0] * v2[1] - v1[1] * v2[0];
+        
+        if (nodes.size() >= 4) {
+            Core::FITKNode* n3 = this->getNodeByID(nodes[3]);
+            if (n3) {
+                double v3[3];
+                for (int i = 0; i < 3; ++i) {
+                    v3[i] = (*n3)[i] - (*n0)[i];
+                }
+                jacobian = v1[0] * (v2[1] * v3[2] - v2[2] * v3[1])
+                         - v1[1] * (v2[0] * v3[2] - v2[2] * v3[0])
+                         + v1[2] * (v2[0] * v3[1] - v2[1] * v3[0]);
+            }
+        }
+        
+        return std::abs(jacobian);
+    }
+    
+    double FITKUnstructuredMesh::calculateSkewness(const int eleIndex)
+    {
+        FITKAbstractElement* ele = this->getElementAt(eleIndex);
+        if (ele == nullptr) return 0.0;
+        
+        FITKModelEnum::FITKEleType eleType = ele->getEleType();
+        QList<int> nodes = ele->getAllNodes();
+        
+        double skewness = 0.0;
+        
+        switch (eleType) {
+        case FITKModelEnum::Tri3:
+        case FITKModelEnum::Tri6: {
+            if (nodes.size() < 3) return 0.0;
+            Core::FITKNode* n0 = this->getNodeByID(nodes[0]);
+            Core::FITKNode* n1 = this->getNodeByID(nodes[1]);
+            Core::FITKNode* n2 = this->getNodeByID(nodes[2]);
+            if (!n0 || !n1 || !n2) return 0.0;
+            
+            double a = Core::Distance(*n0, *n1);
+            double b = Core::Distance(*n1, *n2);
+            double c = Core::Distance(*n2, *n0);
+            
+            double maxEdge = qMax(a, qMax(b, c));
+            double s = (a + b + c) / 2.0;
+            double area = sqrt(s * (s-a) * (s-b) * (s-c));
+            
+            double optimalArea = (sqrt(3.0) / 4.0) * maxEdge * maxEdge;
+            skewness = 1.0 - qMin(area, optimalArea) / qMax(area, optimalArea);
+            break;
+        }
+        case FITKModelEnum::Quad4:
+        case FITKModelEnum::Quad8: {
+            if (nodes.size() < 4) return 0.0;
+            Core::FITKNode* n0 = this->getNodeByID(nodes[0]);
+            Core::FITKNode* n1 = this->getNodeByID(nodes[1]);
+            Core::FITKNode* n2 = this->getNodeByID(nodes[2]);
+            Core::FITKNode* n3 = this->getNodeByID(nodes[3]);
+            if (!n0 || !n1 || !n2 || !n3) return 0.0;
+            
+            double d1 = Core::Distance(*n0, *n2);
+            double d2 = Core::Distance(*n1, *n3);
+            
+            double maxEdge = 0.0;
+            maxEdge = qMax(maxEdge, Core::Distance(*n0, *n1));
+            maxEdge = qMax(maxEdge, Core::Distance(*n1, *n2));
+            maxEdge = qMax(maxEdge, Core::Distance(*n2, *n3));
+            maxEdge = qMax(maxEdge, Core::Distance(*n3, *n0));
+            
+            double optimalDiag = maxEdge * sqrt(2.0);
+            skewness = qAbs(d1 - optimalDiag) / optimalDiag;
+            skewness = qMax(skewness, qAbs(d2 - optimalDiag) / optimalDiag);
+            break;
+        }
+        default:
+            break;
+        }
+        
+        return skewness;
+    }
+    
+    double FITKUnstructuredMesh::calculateWarpage(const int eleIndex)
+    {
+        FITKAbstractElement* ele = this->getElementAt(eleIndex);
+        if (ele == nullptr) return 0.0;
+        
+        FITKModelEnum::FITKEleType eleType = ele->getEleType();
+        QList<int> nodes = ele->getAllNodes();
+        
+        if (eleType != FITKModelEnum::Quad4 && eleType != FITKModelEnum::Quad8 &&
+            eleType != FITKModelEnum::Hex8 && eleType != FITKModelEnum::Hex20) {
+            return 0.0;
+        }
+        
+        if (nodes.size() < 4) return 0.0;
+        
+        Core::FITKNode* n0 = this->getNodeByID(nodes[0]);
+        Core::FITKNode* n1 = this->getNodeByID(nodes[1]);
+        Core::FITKNode* n2 = this->getNodeByID(nodes[2]);
+        Core::FITKNode* n3 = this->getNodeByID(nodes[3]);
+        
+        if (!n0 || !n1 || !n2 || !n3) return 0.0;
+        
+        Core::FITKVec3D v1(*n1, *n0);
+        Core::FITKVec3D v2(*n2, *n0);
+        Core::FITKVec3D normal1 = Core::CrossProduct(v1, v2);
+        
+        Core::FITKVec3D v3(*n3, *n2);
+        Core::FITKVec3D v4(*n0, *n2);
+        Core::FITKVec3D normal2 = Core::CrossProduct(v3, v4);
+        
+        double len1 = sqrt(normal1[0]*normal1[0] + normal1[1]*normal1[1] + normal1[2]*normal1[2]);
+        double len2 = sqrt(normal2[0]*normal2[0] + normal2[1]*normal2[1] + normal2[2]*normal2[2]);
+        
+        if (len1 < 1e-10 || len2 < 1e-10) return 1.0;
+        
+        double dot = normal1[0]*normal2[0] + normal1[1]*normal2[1] + normal1[2]*normal2[2];
+        double cosAngle = dot / (len1 * len2);
+        
+        return 1.0 - qAbs(cosAngle);
+    }
+    
+    double FITKUnstructuredMesh::calculateScaledJacobian(const int eleIndex)
+    {
+        double jac = calculateJacobian(eleIndex);
+        if (jac < 1e-10) return 0.0;
+        
+        FITKAbstractElement* ele = this->getElementAt(eleIndex);
+        if (ele == nullptr) return 0.0;
+        
+        const int n = ele->getEdgeCount();
+        if (n == 0) return 0.0;
+        
+        double maxEdgeLen = 0.0;
+        for (int i = 0; i < n; ++i) {
+            QList<int> edge = ele->getEdge(i);
+            double len = this->calMeshEdgeLength(edge);
+            maxEdgeLen = qMax(maxEdgeLen, len);
+        }
+        
+        if (maxEdgeLen < 1e-10) return 0.0;
+        
+        int dim = ele->getElementDim();
+        double scaleFactor = pow(maxEdgeLen, dim);
+        
+        return jac / scaleFactor;
+    }
+    
+    double FITKUnstructuredMesh::calculateShape(const int eleIndex)
+    {
+        FITKAbstractElement* ele = this->getElementAt(eleIndex);
+        if (ele == nullptr) return 0.0;
+        
+        double volume = calculateElementVolume(eleIndex);
+        if (volume < 1e-10) return 0.0;
+        
+        const int n = ele->getEdgeCount();
+        double sumEdgeLenSq = 0.0;
+        for (int i = 0; i < n; ++i) {
+            QList<int> edge = ele->getEdge(i);
+            double len = this->calMeshEdgeLength(edge);
+            sumEdgeLenSq += len * len;
+        }
+        
+        if (sumEdgeLenSq < 1e-10) return 0.0;
+        
+        int dim = ele->getElementDim();
+        double factor = (dim == 2) ? 4.0 * sqrt(3.0) : 6.0 * pow(2.0, 2.0/3.0);
+        
+        return factor * volume / sumEdgeLenSq;
+    }
+    
+    double FITKUnstructuredMesh::calculateCondition(const int eleIndex)
+    {
+        FITKAbstractElement* ele = this->getElementAt(eleIndex);
+        if (ele == nullptr) return 0.0;
+        
+        QList<int> nodes = ele->getAllNodes();
+        if (nodes.size() < 3) return 0.0;
+        
+        Core::FITKNode* n0 = this->getNodeByID(nodes[0]);
+        Core::FITKNode* n1 = this->getNodeByID(nodes[1]);
+        Core::FITKNode* n2 = this->getNodeByID(nodes[2]);
+        
+        if (!n0 || !n1 || !n2) return 0.0;
+        
+        double J[2][2];
+        J[0][0] = (*n1)[0] - (*n0)[0];
+        J[0][1] = (*n2)[0] - (*n0)[0];
+        J[1][0] = (*n1)[1] - (*n0)[1];
+        J[1][1] = (*n2)[1] - (*n0)[1];
+        
+        double det = J[0][0] * J[1][1] - J[0][1] * J[1][0];
+        if (std::abs(det) < 1e-10) return 1e10;
+        
+        double JTJ[2][2];
+        JTJ[0][0] = J[0][0] * J[0][0] + J[1][0] * J[1][0];
+        JTJ[0][1] = J[0][0] * J[0][1] + J[1][0] * J[1][1];
+        JTJ[1][0] = JTJ[0][1];
+        JTJ[1][1] = J[0][1] * J[0][1] + J[1][1] * J[1][1];
+        
+        double trace = JTJ[0][0] + JTJ[1][1];
+        double detJTJ = JTJ[0][0] * JTJ[1][1] - JTJ[0][1] * JTJ[1][0];
+        
+        double sqrtDiscrim = sqrt(trace * trace - 4.0 * detJTJ);
+        double lambdaMax = (trace + sqrtDiscrim) / 2.0;
+        double lambdaMin = (trace - sqrtDiscrim) / 2.0;
+        
+        if (lambdaMin < 1e-10) return 1e10;
+        
+        return sqrt(lambdaMax / lambdaMin);
+    }
+    
+    double FITKUnstructuredMesh::calculateElementVolume(const int eleIndex)
+    {
+        FITKAbstractElement* ele = this->getElementAt(eleIndex);
+        if (ele == nullptr) return 0.0;
+        
+        QList<int> nodes = ele->getAllNodes();
+        FITKModelEnum::FITKEleType eleType = ele->getEleType();
+        
+        switch (eleType) {
+        case FITKModelEnum::Tri3:
+        case FITKModelEnum::Tri6: {
+            if (nodes.size() < 3) return 0.0;
+            Core::FITKNode* n0 = this->getNodeByID(nodes[0]);
+            Core::FITKNode* n1 = this->getNodeByID(nodes[1]);
+            Core::FITKNode* n2 = this->getNodeByID(nodes[2]);
+            if (!n0 || !n1 || !n2) return 0.0;
+            
+            double a = Core::Distance(*n0, *n1);
+            double b = Core::Distance(*n1, *n2);
+            double c = Core::Distance(*n2, *n0);
+            double s = (a + b + c) / 2.0;
+            return sqrt(s * (s-a) * (s-b) * (s-c));
+        }
+        case FITKModelEnum::Quad4:
+        case FITKModelEnum::Quad8: {
+            if (nodes.size() < 4) return 0.0;
+            Core::FITKNode* n0 = this->getNodeByID(nodes[0]);
+            Core::FITKNode* n1 = this->getNodeByID(nodes[1]);
+            Core::FITKNode* n2 = this->getNodeByID(nodes[2]);
+            Core::FITKNode* n3 = this->getNodeByID(nodes[3]);
+            if (!n0 || !n1 || !n2 || !n3) return 0.0;
+            
+            Core::FITKVec3D v1(*n1, *n0);
+            Core::FITKVec3D v2(*n3, *n0);
+            Core::FITKVec3D v3(*n2, *n1);
+            Core::FITKVec3D v4(*n2, *n3);
+            
+            Core::FITKPoint cross1 = Core::CrossProduct(v1, v2);
+            Core::FITKPoint cross2 = Core::CrossProduct(v3, v4);
+            
+            double area1 = sqrt(cross1[0]*cross1[0] + cross1[1]*cross1[1] + cross1[2]*cross1[2]) / 2.0;
+            double area2 = sqrt(cross2[0]*cross2[0] + cross2[1]*cross2[1] + cross2[2]*cross2[2]) / 2.0;
+            return area1 + area2;
+        }
+        case FITKModelEnum::Tet4:
+        case FITKModelEnum::Tet10: {
+            if (nodes.size() < 4) return 0.0;
+            Core::FITKNode* n0 = this->getNodeByID(nodes[0]);
+            Core::FITKNode* n1 = this->getNodeByID(nodes[1]);
+            Core::FITKNode* n2 = this->getNodeByID(nodes[2]);
+            Core::FITKNode* n3 = this->getNodeByID(nodes[3]);
+            if (!n0 || !n1 || !n2 || !n3) return 0.0;
+            
+            Core::FITKVec3D v1(*n1, *n0);
+            Core::FITKVec3D v2(*n2, *n0);
+            Core::FITKVec3D v3(*n3, *n0);
+            
+            return std::abs(Core::DotProduct(v1, Core::CrossProduct(v2, v3))) / 6.0;
+        }
+        case FITKModelEnum::Hex8:
+        case FITKModelEnum::Hex20: {
+            if (nodes.size() < 8) return 0.0;
+            double volume = 0.0;
+            
+            int tets[6][4] = {
+                {0, 1, 3, 4}, {1, 2, 3, 6},
+                {1, 3, 4, 6}, {3, 4, 6, 7},
+                {1, 4, 5, 6}, {4, 6, 7, 5}
+            };
+            
+            for (int i = 0; i < 6; ++i) {
+                Core::FITKNode* n0 = this->getNodeByID(nodes[tets[i][0]]);
+                Core::FITKNode* n1 = this->getNodeByID(nodes[tets[i][1]]);
+                Core::FITKNode* n2 = this->getNodeByID(nodes[tets[i][2]]);
+                Core::FITKNode* n3 = this->getNodeByID(nodes[tets[i][3]]);
+                
+                if (n0 && n1 && n2 && n3) {
+                    Core::FITKVec3D v1(*n1, *n0);
+                    Core::FITKVec3D v2(*n2, *n0);
+                    Core::FITKVec3D v3(*n3, *n0);
+                    volume += std::abs(Core::DotProduct(v1, Core::CrossProduct(v2, v3))) / 6.0;
+                }
+            }
+            return volume;
+        }
+        default:
+            return 0.0;
+        }
     }
 
     bool FITKUnstructuredMesh::getElementDirection(double* dir, const int id)

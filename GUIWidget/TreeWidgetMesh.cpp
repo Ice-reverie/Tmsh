@@ -1,7 +1,9 @@
 ﻿#include "TreeWidgetMesh.h"
+#include "MeshQualityColorSettingDialog.h"
 
 #include "FITK_Kernel/FITKAppFramework/FITKAppFramework.h"
 #include "FITK_Kernel/FITKAppFramework/FITKGlobalData.h"
+#include "FITK_Kernel/FITKAppFramework/FITKMessage.h"
 #include "FITK_Interface/FITKInterfaceModel/FITKAbstractMesh.h"
 #include "ModelData/MeshManager.h"
 #include "ModelData/MeshData.h"
@@ -9,6 +11,7 @@
 #include "GraphData/GraphDataProvider/GraphDataProviderManager.h"
 #include "GraphData/GraphDataProvider/GraphDataProviderModel.h"
 #include "GraphData/GraphDataAdaptor/GraphObjectBase.h"
+#include "GraphData/GraphDataAdaptor/GraphObjectMesh.h"
 #include "FITK_Component/FITKRenderWindowVTK/FITKGraph3DWindowVTK.h"
 #include "FITK_Kernel/FITKCore/FITKDataRepo.h"
 
@@ -165,9 +168,103 @@ namespace GUI
         if (!item) return;
         int meshId = item->data(0, Qt::UserRole).toInt();
         if (meshId <= 0) return;
+        
+        QAction* qualityColorAct = menu->addAction(tr("Quality Coloring"));
+        connect(qualityColorAct, &QAction::triggered, this, [this, item]() {
+            applyQualityColoring(item);
+        });
+        
+        QAction* clearColorAct = menu->addAction(tr("Clear Quality Coloring"));
+        connect(clearColorAct, &QAction::triggered, this, [this, item]() {
+            clearQualityColoring(item);
+        });
+        
+        menu->addSeparator();
+        
         QAction* delAct = menu->addAction(tr("Delete Mesh"));
         connect(delAct, &QAction::triggered, this, [this, item]() {
             deleteMesh(item);
         });
+    }
+    
+    void TreeWidgetMesh::applyQualityColoring(QTreeWidgetItem* item)
+    {
+        if (!item) {
+            AppFrame::FITKMessageWarning(QStringLiteral("applyQualityColoring: item为空"));
+            return;
+        }
+        int meshId = item->data(0, Qt::UserRole).toInt();
+        if (meshId <= 0) {
+            AppFrame::FITKMessageWarning(QStringLiteral("applyQualityColoring: meshId无效: %1").arg(meshId));
+            return;
+        }
+        
+        AppFrame::FITKMessageNormal(QString(QStringLiteral("开始质量着色, meshId=%1")).arg(meshId));
+        
+        auto* graphWidget = _graphWidget;
+        if (!graphWidget) {
+            AppFrame::FITKMessageWarning(QStringLiteral("applyQualityColoring: graphWidget为空"));
+            return;
+        }
+        
+        auto* modelProvider = Graph::GraphDataProviderManager::getInstance()->getModelProvider(graphWidget);
+        if (!modelProvider) {
+            AppFrame::FITKMessageWarning(QStringLiteral("applyQualityColoring: modelProvider为空"));
+            return;
+        }
+        
+        Graph::GraphObjectBase* obj = modelProvider->getMeshKernelGraph(meshId);
+        if (!obj) {
+            AppFrame::FITKMessageWarning(QStringLiteral("applyQualityColoring: 未找到网格图形对象"));
+            return;
+        }
+        
+        Graph::GraphObjectMesh* meshObj = dynamic_cast<Graph::GraphObjectMesh*>(obj);
+        if (!meshObj) {
+            AppFrame::FITKMessageWarning(QStringLiteral("applyQualityColoring: 图形对象类型转换失败"));
+            return;
+        }
+        
+        AppFrame::FITKMessageNormal(QStringLiteral("成功获取网格对象，打开设置对话框"));
+        
+        MeshQualityColorSettingDialog dialog(this);
+        
+        connect(&dialog, &MeshQualityColorSettingDialog::settingsChanged,
+                this, [meshObj, graphWidget](Interface::QualityMetric metric,
+                                             Graph::ColorScheme scheme,
+                                             double minVal,
+                                             double maxVal,
+                                             bool autoRange) {
+            AppFrame::FITKMessageNormal(QStringLiteral("应用质量着色设置"));
+            meshObj->applyQualityColoring(metric, scheme, minVal, maxVal, autoRange);
+            graphWidget->reRender();
+            AppFrame::FITKMessageNormal(QStringLiteral("渲染刷新完成"));
+        });
+        
+        dialog.exec();
+    }
+    
+    void TreeWidgetMesh::clearQualityColoring(QTreeWidgetItem* item)
+    {
+        if (!item) return;
+        int meshId = item->data(0, Qt::UserRole).toInt();
+        if (meshId <= 0) return;
+        
+        auto* graphWidget = _graphWidget;
+        if (!graphWidget) return;
+        
+        auto* modelProvider = Graph::GraphDataProviderManager::getInstance()->getModelProvider(graphWidget);
+        if (!modelProvider) return;
+        
+        Graph::GraphObjectBase* obj = modelProvider->getMeshKernelGraph(meshId);
+        if (!obj) return;
+        
+        Graph::GraphObjectMesh* meshObj = dynamic_cast<Graph::GraphObjectMesh*>(obj);
+        if (!meshObj) {
+            return;
+        }
+        
+        meshObj->clearQualityColoring();
+        graphWidget->reRender();
     }
 }

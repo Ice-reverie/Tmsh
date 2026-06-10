@@ -96,6 +96,69 @@ namespace Interface
          * @date 2024-06-23
          */
         FITKElemntQuality checkElementQuality(const int eleIndex);
+        
+        /**
+         * @brief 计算单元雅可比行列式值
+         * @param[i] eleIndex 单元索引
+         * @return double 雅可比值
+         * @author IndustrialMesh
+         * @date 2026-06-10
+         */
+        double calculateJacobian(const int eleIndex);
+        
+        /**
+         * @brief 计算单元偏斜度
+         * @param[i] eleIndex 单元索引
+         * @return double 偏斜度值 [0, 1]
+         * @author IndustrialMesh
+         * @date 2026-06-10
+         */
+        double calculateSkewness(const int eleIndex);
+        
+        /**
+         * @brief 计算单元扭曲度(适用于四边形和六面体)
+         * @param[i] eleIndex 单元索引
+         * @return double 扭曲度值
+         * @author IndustrialMesh
+         * @date 2026-06-10
+         */
+        double calculateWarpage(const int eleIndex);
+        
+        /**
+         * @brief 计算缩放雅可比
+         * @param[i] eleIndex 单元索引
+         * @return double 缩放雅可比值
+         * @author IndustrialMesh
+         * @date 2026-06-10
+         */
+        double calculateScaledJacobian(const int eleIndex);
+        
+        /**
+         * @brief 计算形状因子
+         * @param[i] eleIndex 单元索引
+         * @return double 形状因子值 [0, 1]
+         * @author IndustrialMesh
+         * @date 2026-06-10
+         */
+        double calculateShape(const int eleIndex);
+        
+        /**
+         * @brief 计算条件数
+         * @param[i] eleIndex 单元索引
+         * @return double 条件数值
+         * @author IndustrialMesh
+         * @date 2026-06-10
+         */
+        double calculateCondition(const int eleIndex);
+        
+        /**
+         * @brief 计算单元面积(2D)或体积(3D)
+         * @param[i] eleIndex 单元索引
+         * @return double 面积或体积
+         * @author IndustrialMesh
+         * @date 2026-06-10
+         */
+        double calculateElementVolume(const int eleIndex);
 
         /**
          * @brief 获取单元方向，支持线单元与壳单元

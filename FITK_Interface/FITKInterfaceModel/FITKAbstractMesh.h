@@ -19,6 +19,23 @@ namespace Interface
         double _minEdgeLength{ 0 }; //最短边长
         double _maxEdgeLength{ 0 }; //最长边长
         double _aspectRatio{ 0 };   //长宽比
+        double _jacobian{ 0 };      //雅可比行列式值
+        double _skewness{ 0 };      //偏斜度
+        double _warpage{ 0 };       //扭曲度
+        double _scaledJacobian{ 0 }; //缩放雅可比
+        double _shape{ 0 };         //形状因子
+        double _condition{ 0 };     //条件数
+    };
+    
+    enum class QualityMetric
+    {
+        AspectRatio = 0,    //长宽比
+        Jacobian,           //雅可比
+        Skewness,           //偏斜度
+        Warpage,            //扭曲度
+        ScaledJacobian,     //缩放雅可比
+        Shape,              //形状因子
+        Condition           //条件数
     };
 
     /**

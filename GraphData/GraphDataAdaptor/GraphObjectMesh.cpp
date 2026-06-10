@@ -1,4 +1,5 @@
 ﻿#include "GraphObjectMesh.h"
+#include "MeshQualityColorMapper.h"
 
 #include "ModelData/MeshKernel.h"
 
@@ -574,5 +575,99 @@ namespace Graph
         if (grid) {
             dataSet->DeepCopy(grid);
         }
+    }
+    
+    void GraphObjectMesh::applyQualityColoring(Interface::QualityMetric qualityMetric,
+                                                Graph::ColorScheme colorScheme,
+                                                double minVal,
+                                                double maxVal,
+                                                bool autoRange)
+    {
+        if (_meshData == nullptr) {
+            AppFrame::FITKMessageWarning(QStringLiteral("质量着色失败: _meshData为空"));
+            return;
+        }
+        
+        ModelData::MeshKernel* meshKernel = dynamic_cast<ModelData::MeshKernel*>(_dataObj);
+        if (meshKernel == nullptr) {
+            AppFrame::FITKMessageWarning(QStringLiteral("质量着色失败: meshKernel为空"));
+            return;
+        }
+        
+        Interface::FITKAbstractMesh* absMesh = meshKernel->getMesh();
+        if (absMesh == nullptr) {
+            AppFrame::FITKMessageWarning(QStringLiteral("质量着色失败: absMesh为空"));
+            return;
+        }
+        
+        Interface::FITKUnstructuredMesh* unstrMesh = nullptr;
+        if (absMesh->getAbsModelType() == Interface::FITKModelEnum::AMTunstructuredMesh ||
+            absMesh->getAbsModelType() == Interface::FITKModelEnum::AMTunstructuredMeshvtk) {
+            unstrMesh = dynamic_cast<Interface::FITKUnstructuredMesh*>(absMesh);
+        }
+        
+        if (unstrMesh == nullptr) {
+            AppFrame::FITKMessageWarning(QStringLiteral("质量着色仅支持非结构化网格"));
+            return;
+        }
+        
+        const int eleCount = unstrMesh->getElementCount();
+        const int vtkCellCount = _meshData->GetNumberOfCells();
+        
+        AppFrame::FITKMessageNormal(QString(QStringLiteral("质量着色: 单元数=%1, VTK单元数=%2")).arg(eleCount).arg(vtkCellCount));
+        
+        if (eleCount == 0) {
+            AppFrame::FITKMessageWarning(QStringLiteral("质量着色失败: 网格单元数为0"));
+            return;
+        }
+        
+        QList<Interface::FITKElemntQuality> qualities;
+        qualities.reserve(eleCount);
+        
+        for (int i = 0; i < eleCount; ++i) {
+            qualities.append(unstrMesh->checkElementQuality(i));
+        }
+        
+        MeshQualityColorMapper mapper;
+        mapper.setColorScheme(colorScheme);
+        mapper.setQualityMetric(qualityMetric);
+        mapper.setAutoRange(autoRange);
+        
+        if (autoRange) {
+            mapper.computeAutoRange(qualities);
+        } else {
+            mapper.setRange(minVal, maxVal);
+        }
+        
+        AppFrame::FITKMessageNormal(QString(QStringLiteral("质量范围: %1 ~ %2")).arg(mapper.getMinValue()).arg(mapper.getMaxValue()));
+        
+        vtkUnsignedCharArray* colorArray = vtkUnsignedCharArray::SafeDownCast(
+            _meshData->GetCellData()->GetArray(GraphObjectCommons::_dataColorArrayName.toUtf8().constData()));
+        
+        if (colorArray == nullptr) {
+            AppFrame::FITKMessageWarning(QStringLiteral("质量着色失败: 颜色数组为空"));
+            return;
+        }
+        
+        colorArray->SetNumberOfTuples(0);
+        
+        for (int i = 0; i < vtkCellCount; ++i) {
+            int eleIndex = (i < eleCount) ? i : (eleCount - 1);
+            QColor color = mapper.mapToColor(qualities[eleIndex]);
+            colorArray->InsertNextTuple3(color.red(), color.green(), color.blue());
+        }
+        
+        _meshData->Modified();
+        
+        if (_meshActor) {
+            _meshActor->Modified();
+        }
+        
+        AppFrame::FITKMessageNormal(QStringLiteral("质量着色完成"));
+    }
+    
+    void GraphObjectMesh::clearQualityColoring()
+    {
+        updateModelColor();
     }
 }

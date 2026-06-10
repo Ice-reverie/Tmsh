@@ -9,6 +9,7 @@
 
 #include "GraphDataAdaptorAPI.h"
 #include "GraphObjectBase.h"
+#include "FITK_Interface/FITKInterfaceModel/FITKAbstractMesh.h"
 
 namespace ModelData {
     class MeshKernel;
@@ -26,6 +27,7 @@ class vtkStructuredGrid;
 
 namespace Graph
 {
+    enum class ColorScheme;
     /**
      * @brief  几何渲染对象
      * @author BaGuijun (baguijun@163.com)
@@ -77,6 +79,27 @@ namespace Graph
          * @date     2025-03-31
          */
         virtual void updateModelColor(QColor color = QColor()) override;
+        /**
+         * @brief    应用质量着色
+         * @param[i] qualityMetric            质量指标
+         * @param[i] colorScheme              颜色方案
+         * @param[i] minVal                   最小值(自动范围时忽略)
+         * @param[i] maxVal                   最大值(自动范围时忽略)
+         * @param[i] autoRange                是否自动范围
+         * @author   IndustrialMesh
+         * @date     2026-06-10
+         */
+        void applyQualityColoring(Interface::QualityMetric qualityMetric,
+                                  Graph::ColorScheme colorScheme,
+                                  double minVal = 1.0,
+                                  double maxVal = 10.0,
+                                  bool autoRange = true);
+        /**
+         * @brief    清除质量着色，恢复默认颜色
+         * @author   IndustrialMesh
+         * @date     2026-06-10
+         */
+        void clearQualityColoring();
         /**
          * @brief    通过分组数据id获取对应的VTK单元id链表
          * @param[i] comID                         分组对象id

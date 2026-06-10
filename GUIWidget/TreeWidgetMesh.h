@@ -39,6 +39,8 @@ namespace GUI
     private:
         void toggleMeshVisible(QTreeWidgetItem* item, bool on);
         void deleteMesh(QTreeWidgetItem* item);
+        void applyQualityColoring(QTreeWidgetItem* item);
+        void clearQualityColoring(QTreeWidgetItem* item);
 
     private:
         Comp::FITKGraph3DWindowVTK* _graphWidget{ nullptr };

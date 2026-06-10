@@ -9,6 +9,7 @@ HEADERS += \
     $$PWD/ViewAdaptorBase.h \
     $$PWD/ViewAdaptorGeoModel.h \
     $$PWD/ViewAdaptorMesh.h \
+    $$PWD/MeshQualityColorMapper.h \
     
 SOURCES += \ 
     $$PWD/GraphObjectCommons.cpp \
@@ -20,3 +21,4 @@ SOURCES += \
     $$PWD/ViewAdaptorBase.cpp \
     $$PWD/ViewAdaptorGeoModel.cpp \
     $$PWD/ViewAdaptorMesh.cpp \
+    $$PWD/MeshQualityColorMapper.cpp \
