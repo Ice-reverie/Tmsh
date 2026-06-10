@@ -19,6 +19,7 @@
 #include "GUIWidget/GUIEnumType.h"
 #include "GUIFrame/ControlPanel.h"
 
+#include <QDir>
 #include <QDateTime>
 #include <QFileInfo>
 #include <QMessageBox>
@@ -77,40 +78,80 @@ namespace ModelOper
         return true;
     }
 
-	void OperTmshGenerator::meshGenOper()
-	{
+    void OperTmshGenerator::meshGenOper()
+    {
         QString meshPath = FITKAPP->getTempDir(false, "");
-		QString meshFile = QString("%1/%2").arg(meshPath).arg("geometryFile");
+        QString meshFile = QString("%1/%2").arg(meshPath).arg("geometryFile");
         QString meshName = Interface::FITKMeshGenInterface::getMeshFileName();
-		if (meshName == "")
-		{
+        if (meshName == "")
+        {
             meshName = "geometryFile.surf.mesh";
-		}
-		QString meshFileProcessor = QString("%1/%2").arg(meshPath).arg(meshName);
-		Interface::FITKMeshGenInterface* mf = Interface::FITKMeshGenInterface::getInstance();
-		if (!mf) return;
-		Interface::FITKAbstractMesherDriver* mesher = mf->getMesherDriver("TmshExec");
-		if (!mesher) return;
-		_mesher = mesher;
+        }
+        QString meshFileProcessor = QString("%1/%2").arg(meshPath).arg(meshName);
+
+        // 清理旧的网格文件，避免读取历史文件
+        QDir meshDir(meshPath);
+        QStringList oldMeshFiles = meshDir.entryList(QStringList() << "geometryFile.surf.*.mesh", QDir::Files);
+        for (const QString& oldFile : oldMeshFiles)
+        {
+            QString fullOldPath = meshDir.filePath(oldFile);
+            if (QFile::remove(fullOldPath))
+            {
+                AppFrame::FITKMessageNormal(QString("Removed old mesh file: %1").arg(oldFile));
+            }
+        }
+        // 也删除当前的surf.mesh文件
+        QString currentSurfMesh = meshDir.filePath("geometryFile.surf.mesh");
+        if (QFile::exists(currentSurfMesh))
+        {
+            QFile::remove(currentSurfMesh);
+            AppFrame::FITKMessageNormal("Removed old geometryFile.surf.mesh");
+        }
+
+        Interface::FITKMeshGenInterface* mf = Interface::FITKMeshGenInterface::getInstance();
+        if (!mf) return;
+        Interface::FITKAbstractMesherDriver* mesher = mf->getMesherDriver("TmshExec");
+        if (!mesher) return;
+        _mesher = mesher;
         disconnect(mesher, &Interface::FITKAbstractMesherDriver::mesherFinished, this, &OperTmshGenerator::meshGenFinished);
         connect(mesher, &Interface::FITKAbstractMesherDriver::mesherFinished, this, &OperTmshGenerator::meshGenFinished, Qt::UniqueConnection);
-		mesher->setValue("MeshFile", meshFile);
-		mesher->setValue("MeshFileProcessor", meshFileProcessor);
-		mesher->setValue("Method", 1);
-		mesher->startMesher();
-		this->setArgs("MeshFile", meshFile);
-	}
+        mesher->setValue("MeshFile", meshFile);
+        mesher->setValue("MeshFileProcessor", meshFileProcessor);
+        mesher->setValue("Method", 1);
+        mesher->startMesher();
+        this->setArgs("MeshFile", meshFile);
+    }
 
     void OperTmshGenerator::tetGenOper()
     {
         QString meshPath = FITKAPP->getTempDir(false, "");
-		QString meshFile = QString("%1/%2").arg(meshPath).arg("geometryFile");
-		QString meshName = Interface::FITKMeshGenInterface::getMeshFileName();
-		if (meshName == "")
-		{
-			meshName = "geometryFile.surf.1.mesh";
-		}
-		QString meshFileProcessor = QString("%1/%2").arg(meshPath).arg(meshName);
+        QString meshFile = QString("%1/%2").arg(meshPath).arg("geometryFile");
+        QString meshName = Interface::FITKMeshGenInterface::getMeshFileName();
+        if (meshName == "")
+        {
+            meshName = "geometryFile.surf.1.mesh";
+        }
+        QString meshFileProcessor = QString("%1/%2").arg(meshPath).arg(meshName);
+
+        // 清理旧的网格文件，避免读取历史文件
+        QDir meshDir(meshPath);
+        QStringList oldMeshFiles = meshDir.entryList(QStringList() << "geometryFile.surf.*.mesh", QDir::Files);
+        for (const QString& oldFile : oldMeshFiles)
+        {
+            QString fullOldPath = meshDir.filePath(oldFile);
+            if (QFile::remove(fullOldPath))
+            {
+                AppFrame::FITKMessageNormal(QString("Removed old mesh file: %1").arg(oldFile));
+            }
+        }
+        // 也删除当前的surf.mesh文件
+        QString currentSurfMesh = meshDir.filePath("geometryFile.surf.mesh");
+        if (QFile::exists(currentSurfMesh))
+        {
+            QFile::remove(currentSurfMesh);
+            AppFrame::FITKMessageNormal("Removed old geometryFile.surf.mesh");
+        }
+
         Interface::FITKMeshGenInterface* mf = Interface::FITKMeshGenInterface::getInstance();
         if (!mf) return;
         Interface::FITKAbstractMesherDriver* mesher = mf->getMesherDriver("TmshExec");
@@ -139,13 +180,13 @@ namespace ModelOper
         _isMeshFinishedExecuting = true;
 
         const QString meshFile = _mesher->getValueT<QString>("MeshFileProcessor");
-        
+
         AppFrame::FITKMessageNormal(QString("MeshFileProcessor: %1").arg(meshFile));
 
         if (meshFile.isEmpty())
         {
             AppFrame::FITKMessageError("MeshFileProcessor is empty!");
-            QMessageBox::warning(FITKAPP->getGlobalData()->getMainWindow(), tr("Warning"), 
+            QMessageBox::warning(FITKAPP->getGlobalData()->getMainWindow(), tr("Warning"),
                 tr("Mesh file path is empty!"), QMessageBox::StandardButton::Ok);
             _isMeshFinishedExecuting = false;
             return;
@@ -160,11 +201,11 @@ namespace ModelOper
             waitCount++;
             AppFrame::FITKMessageNormal(QString("Waiting for mesh file... (%1/50)").arg(waitCount));
         }
-        
+
         if (!fileInfo.exists())
         {
             AppFrame::FITKMessageError(QString("Mesh file does not exist after waiting: %1").arg(meshFile));
-            QMessageBox::warning(FITKAPP->getGlobalData()->getMainWindow(), tr("Warning"), 
+            QMessageBox::warning(FITKAPP->getGlobalData()->getMainWindow(), tr("Warning"),
                 tr("Mesh file not found:\n%1").arg(meshFile), QMessageBox::StandardButton::Ok);
             _isMeshFinishedExecuting = false;
             return;
@@ -173,7 +214,7 @@ namespace ModelOper
         if (!fileInfo.isFile())
         {
             AppFrame::FITKMessageError(QString("Path is not a file: %1").arg(meshFile));
-            QMessageBox::warning(FITKAPP->getGlobalData()->getMainWindow(), tr("Warning"), 
+            QMessageBox::warning(FITKAPP->getGlobalData()->getMainWindow(), tr("Warning"),
                 tr("Path is not a file:\n%1").arg(meshFile), QMessageBox::StandardButton::Ok);
             _isMeshFinishedExecuting = false;
             return;
@@ -182,7 +223,7 @@ namespace ModelOper
         if (fileInfo.size() == 0)
         {
             AppFrame::FITKMessageError(QString("Mesh file is empty: %1").arg(meshFile));
-            QMessageBox::warning(FITKAPP->getGlobalData()->getMainWindow(), tr("Warning"), 
+            QMessageBox::warning(FITKAPP->getGlobalData()->getMainWindow(), tr("Warning"),
                 tr("Mesh file is empty:\n%1").arg(meshFile), QMessageBox::StandardButton::Ok);
             _isMeshFinishedExecuting = false;
             return;
@@ -197,7 +238,7 @@ namespace ModelOper
             _isMeshFinishedExecuting = false;
             return;
         }
-        
+
         ModelData::MeshData* meshData = meshManager->getMeshDataObjectByNameT<ModelData::MeshData>("Tmsh");
         if (!meshData)
         {
@@ -206,6 +247,10 @@ namespace ModelOper
             return;
         }
 
+        // 清空旧的网格数据，避免显示历史网格
+        meshData->clear();
+        AppFrame::FITKMessageNormal("Cleared previous mesh data");
+
         Interface::FITKMeshGenInterface* mf = Interface::FITKMeshGenInterface::getInstance();
         if (!mf)
         {
@@ -213,7 +258,7 @@ namespace ModelOper
             _isMeshFinishedExecuting = false;
             return;
         }
-        
+
         Interface::FITKAbstractMeshProcessor* processorMesh = mf->getMeshProcessor("TmshExec");
         if (!processorMesh)
         {
@@ -221,7 +266,7 @@ namespace ModelOper
             _isMeshFinishedExecuting = false;
             return;
         }
-        
+
         processorMesh->setValue("File", meshFile);
         processorMesh->setValue("FilterDim", QList<QVariant>() << 0 << 1);
 

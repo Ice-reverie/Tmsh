@@ -5,6 +5,7 @@ HEADERS += \
     $$PWD/MeshDataTmshExec.h \
 
 SOURCES += \
+    $$PWD/OperTmshGenerator.cpp \
     $$PWD/PluginTmshExec.cpp \
     $$PWD/OperTmshGenerator.cpp \
     $$PWD/MeshDataTmshExec.cpp \
