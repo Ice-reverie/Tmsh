@@ -139,14 +139,14 @@ namespace GUI
         }
 
         Graph::ColorSchemeSemantics sem = Graph::colorSchemeSemantics(effectiveScheme);
-        QString hint = QStringLiteral("本方案参考：%1=质量好，%2=质量差")
-                       .arg(colorName(sem.badColor), colorName(sem.goodColor));
+        //QString hint = QStringLiteral("本方案参考：%1=质量好，%2=质量差")
+        //               .arg(colorName(sem.badColor), colorName(sem.goodColor));
 
         QFont hintFont = painter.font();
         hintFont.setPointSize(8);
         painter.setFont(hintFont);
         painter.setPen(QColor(80, 80, 80));
-        painter.drawText(QRect(barLeft, height() - 22, w - barLeft * 2, 18),
-                         Qt::AlignLeft | Qt::AlignVCenter, hint);
+        //painter.drawText(QRect(barLeft, height() - 22, w - barLeft * 2, 18),
+        //                 Qt::AlignLeft | Qt::AlignVCenter, hint);
     }
 }
