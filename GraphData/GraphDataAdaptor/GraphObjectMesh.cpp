@@ -577,6 +577,61 @@ namespace Graph
         }
     }
     
+    bool GraphObjectMesh::computeQualityRange(Interface::QualityMetric qualityMetric,
+                                              double& minValue,
+                                              double& maxValue) const
+    {
+        if (_meshData == nullptr) {
+            AppFrame::FITKMessageWarning(QStringLiteral("computeQualityRange: _meshData为空"));
+            return false;
+        }
+
+        ModelData::MeshKernel* meshKernel = dynamic_cast<ModelData::MeshKernel*>(_dataObj);
+        if (meshKernel == nullptr) {
+            AppFrame::FITKMessageWarning(QStringLiteral("computeQualityRange: meshKernel为空"));
+            return false;
+        }
+
+        Interface::FITKAbstractMesh* absMesh = meshKernel->getMesh();
+        if (absMesh == nullptr) {
+            AppFrame::FITKMessageWarning(QStringLiteral("computeQualityRange: absMesh为空"));
+            return false;
+        }
+
+        Interface::FITKUnstructuredMesh* unstrMesh = nullptr;
+        if (absMesh->getAbsModelType() == Interface::FITKModelEnum::AMTunstructuredMesh ||
+            absMesh->getAbsModelType() == Interface::FITKModelEnum::AMTunstructuredMeshvtk) {
+            unstrMesh = dynamic_cast<Interface::FITKUnstructuredMesh*>(absMesh);
+        }
+
+        if (unstrMesh == nullptr) {
+            AppFrame::FITKMessageWarning(QStringLiteral("computeQualityRange: 仅支持非结构化网格"));
+            return false;
+        }
+
+        const int eleCount = unstrMesh->getElementCount();
+        if (eleCount == 0) {
+            AppFrame::FITKMessageWarning(QStringLiteral("computeQualityRange: 网格单元数为0"));
+            return false;
+        }
+
+        QList<Interface::FITKElemntQuality> qualities;
+        qualities.reserve(eleCount);
+        for (int i = 0; i < eleCount; ++i) {
+            qualities.append(unstrMesh->checkElementQuality(i));
+        }
+
+        MeshQualityColorMapper mapper;
+        mapper.setQualityMetric(qualityMetric);
+        mapper.computeAutoRange(qualities);
+
+        minValue = mapper.getMinValue();
+        maxValue = mapper.getMaxValue();
+
+        AppFrame::FITKMessageNormal(QString(QStringLiteral("computeQualityRange: 质量范围 %1 ~ %2")).arg(minValue).arg(maxValue));
+        return true;
+    }
+
     void GraphObjectMesh::applyQualityColoring(Interface::QualityMetric qualityMetric,
                                                 Graph::ColorScheme colorScheme,
                                                 double minVal,
@@ -634,7 +689,11 @@ namespace Graph
         mapper.setAutoRange(autoRange);
         
         if (autoRange) {
-            mapper.computeAutoRange(qualities);
+            double autoMin = 0.0;
+            double autoMax = 0.0;
+            if (computeQualityRange(qualityMetric, autoMin, autoMax)) {
+                mapper.setRange(autoMin, autoMax);
+            }
         } else {
             mapper.setRange(minVal, maxVal);
         }

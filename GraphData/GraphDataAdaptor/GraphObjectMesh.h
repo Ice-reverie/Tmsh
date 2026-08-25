@@ -95,6 +95,18 @@ namespace Graph
                                   double maxVal = 10.0,
                                   bool autoRange = true);
         /**
+         * @brief    计算指定质量指标的取值区间
+         * @param[i] qualityMetric            质量指标
+         * @param[o] minValue                 最小值
+         * @param[o] maxValue                 最大值
+         * @return   bool                     是否成功
+         * @author   IndustrialMesh
+         * @date     2026-06-10
+         */
+        bool computeQualityRange(Interface::QualityMetric qualityMetric,
+                                 double& minValue,
+                                 double& maxValue) const;
+        /**
          * @brief    清除质量着色，恢复默认颜色
          * @author   IndustrialMesh
          * @date     2026-06-10

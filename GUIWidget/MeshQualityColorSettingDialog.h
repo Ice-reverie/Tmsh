@@ -21,6 +21,8 @@ class QLabel;
 
 namespace GUI
 {
+    class MeshQualityColorLegend;
+
     class GUIWidgetAPI MeshQualityColorSettingDialog : public QDialog
     {
         Q_OBJECT
@@ -52,6 +54,7 @@ namespace GUI
         void onAutoRangeToggled(bool checked);
         void onApplyClicked();
         void onOkClicked();
+        void onLegendRefresh();
 
     private:
         void initUI();
@@ -66,6 +69,7 @@ namespace GUI
         QPushButton* _applyBtn{ nullptr };
         QPushButton* _okBtn{ nullptr };
         QPushButton* _cancelBtn{ nullptr };
+        MeshQualityColorLegend* _legend{ nullptr };
     };
 }
 

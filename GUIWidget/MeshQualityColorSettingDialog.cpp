@@ -1,4 +1,5 @@
 #include "MeshQualityColorSettingDialog.h"
+#include "MeshQualityColorLegend.h"
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QGroupBox>
@@ -52,6 +53,10 @@ namespace GUI
         schemeRow->addWidget(_schemeCombo);
         colorLayout->addLayout(schemeRow);
 
+        _legend = new MeshQualityColorLegend(colorGroup);
+        _legend->setMinimumHeight(80);
+        colorLayout->addWidget(_legend);
+
         mainLayout->addWidget(colorGroup);
 
         QGroupBox* rangeGroup = new QGroupBox(QStringLiteral("ÊýÖµ·¶Î§"), this);
@@ -100,6 +105,19 @@ namespace GUI
         buttonLayout->addWidget(_cancelBtn);
 
         mainLayout->addLayout(buttonLayout);
+
+        connect(_schemeCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+                this, &MeshQualityColorSettingDialog::onLegendRefresh);
+        connect(_metricCombo, QOverload<int>::of(&QComboBox::currentIndexChanged),
+                this, &MeshQualityColorSettingDialog::onLegendRefresh);
+        connect(_minSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+                this, &MeshQualityColorSettingDialog::onLegendRefresh);
+        connect(_maxSpin, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+                this, &MeshQualityColorSettingDialog::onLegendRefresh);
+        connect(_autoRangeCheck, &QCheckBox::toggled,
+                this, &MeshQualityColorSettingDialog::onLegendRefresh);
+
+        onLegendRefresh();
     }
 
     Interface::QualityMetric MeshQualityColorSettingDialog::getQualityMetric() const
@@ -171,5 +189,15 @@ namespace GUI
         bool enabled = !_autoRangeCheck->isChecked();
         _minSpin->setEnabled(enabled);
         _maxSpin->setEnabled(enabled);
+    }
+
+    void MeshQualityColorSettingDialog::onLegendRefresh()
+    {
+        if (_legend == nullptr) {
+            return;
+        }
+        _legend->setDirectionVisible(true);
+        _legend->setLegendData(getColorScheme(), getQualityMetric(),
+                               getMinValue(), getMaxValue());
     }
 }

@@ -23,6 +23,23 @@ namespace Graph
         Cool            //ÀäÉ«£ºÇà-À¶-×Ï
     };
 
+    enum class QualityDirection
+    {
+        LowerIsBetter = 0,
+        HigherIsBetter,
+        Undefined
+    };
+
+    struct ColorSchemeSemantics
+    {
+        QColor badColor;
+        QColor goodColor;
+        bool   goodAtMaxEnd;
+    };
+
+    GraphDataAdaptorAPI QualityDirection qualityMetricDirection(Interface::QualityMetric metric);
+    GraphDataAdaptorAPI ColorSchemeSemantics colorSchemeSemantics(ColorScheme scheme);
+
     class GraphDataAdaptorAPI MeshQualityColorMapper
     {
     public:

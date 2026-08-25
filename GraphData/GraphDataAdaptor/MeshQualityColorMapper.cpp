@@ -174,4 +174,39 @@ namespace Graph
             return quality._aspectRatio;
         }
     }
+
+    QualityDirection qualityMetricDirection(Interface::QualityMetric metric)
+    {
+        switch (metric) {
+        case Interface::QualityMetric::AspectRatio:
+        case Interface::QualityMetric::Skewness:
+        case Interface::QualityMetric::Warpage:
+        case Interface::QualityMetric::Condition:
+            return QualityDirection::LowerIsBetter;
+        case Interface::QualityMetric::Jacobian:
+        case Interface::QualityMetric::ScaledJacobian:
+        case Interface::QualityMetric::Shape:
+            return QualityDirection::HigherIsBetter;
+        default:
+            return QualityDirection::Undefined;
+        }
+    }
+
+    ColorSchemeSemantics colorSchemeSemantics(ColorScheme scheme)
+    {
+        switch (scheme) {
+        case ColorScheme::Traffic:
+            return { QColor(255, 0, 0), QColor(0, 255, 0), true };
+        case ColorScheme::BlueRed:
+            return { QColor(255, 0, 0), QColor(0, 0, 255), false };
+        case ColorScheme::Rainbow:
+            return { QColor(255, 0, 0), QColor(0, 0, 255), true };
+        case ColorScheme::Heat:
+            return { QColor(255, 255, 255), QColor(0, 0, 0), false };
+        case ColorScheme::Cool:
+            return { QColor(128, 0, 128), QColor(0, 255, 255), false };
+        default:
+            return { QColor(255, 0, 0), QColor(0, 255, 0), true };
+        }
+    }
 }

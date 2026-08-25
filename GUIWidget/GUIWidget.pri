@@ -7,6 +7,7 @@ HEADERS += \
     $$PWD/TreeItemWidgetModel.h \
     $$PWD/TopoColorWidget.h \
     $$PWD/MeshQualityColorSettingDialog.h \
+    $$PWD/MeshQualityColorLegend.h \
 
 
 SOURCES += \
@@ -16,6 +17,7 @@ SOURCES += \
     $$PWD/TreeItemWidgetModel.cpp \
     $$PWD/TopoColorWidget.cpp \
     $$PWD/MeshQualityColorSettingDialog.cpp \
+    $$PWD/MeshQualityColorLegend.cpp \
     
 FORMS += \
 #    $$PWD/PluginManageDialog.ui \

@@ -228,6 +228,15 @@ namespace GUI
         AppFrame::FITKMessageNormal(QStringLiteral("成功获取网格对象，打开设置对话框"));
         
         MeshQualityColorSettingDialog dialog(this);
+
+        double autoMin = 1.0;
+        double autoMax = 10.0;
+        Interface::QualityMetric defaultMetric = Interface::QualityMetric::AspectRatio;
+        if (meshObj->computeQualityRange(defaultMetric, autoMin, autoMax)) {
+            dialog.setCurrentValues(defaultMetric, Graph::ColorScheme::Traffic, autoMin, autoMax, true);
+        } else {
+            AppFrame::FITKMessageWarning(QStringLiteral("applyQualityColoring: 自动范围查询失败，使用默认范围"));
+        }
         
         connect(&dialog, &MeshQualityColorSettingDialog::settingsChanged,
                 this, [meshObj, graphWidget](Interface::QualityMetric metric,
